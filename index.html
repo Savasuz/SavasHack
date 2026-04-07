@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAVAS CASINO VIP</title>
+
+<style>
+  :root{
+    --blue1:#19b8ff;
+    --blue2:#1877ff;
+    --panel:#07111f;
+    --line:rgba(72,153,255,.28);
+    --text:#f4f8ff;
+    --muted:#b7c7de;
+    --green:#42ff7b;
+    --red:#ff4b5c;
+  }
+
+  *{
+    box-sizing:border-box;
+    -webkit-tap-highlight-color:transparent;
+  }
+
+  html,body{
+    margin:0;
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    font-family:Arial,sans-serif;
+    background:black;
+    color:var(--text);
+  }
+
+  canvas{
+    position:fixed;
+    inset:0;
+    z-index:-1;
+  }
+
+  .settings{
+    position:fixed;
+    top:16px;
+    left:16px;
+    font-size:28px;
+    cursor:pointer;
+    z-index:30;
+  }
+
+  #status{
+    position:fixed;
+    top:16px;
+    left:50%;
+    transform:translateX(-50%);
+    font-weight:800;
+    font-size:15px;
+    z-index:30;
+    text-align:center;
+    white-space:nowrap;
+  }
+
+  .support{
+    display:block;
+    margin-top:12px;
+    color:#47b8ff;
+    text-decoration:none;
+    font-size:15px;
+  }
+
+  .screen{
+    width:100%;
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:86px 18px 24px;
+  }
+
+  .panel{
+    width:100%;
+    max-width:380px;
+    background:rgba(7,17,31,.72);
+    border:1px solid var(--line);
+    border-radius:28px;
+    box-shadow:0 0 24px rgba(24,119,255,.12);
+    backdrop-filter:blur(8px);
+    -webkit-backdrop-filter:blur(8px);
+    padding:22px 18px;
+    text-align:center;
+  }
+
+  .title{
+    margin:0 0 8px;
+    font-size:28px;
+    font-weight:800;
+  }
+
+  .sub{
+    margin:0 0 14px;
+    color:var(--muted);
+    font-size:14px;
+  }
+
+  input{
+    width:100%;
+    padding:14px 12px;
+    border:none;
+    outline:none;
+    border-radius:16px;
+    text-align:center;
+    font-size:16px;
+    background:#0c1a2d;
+    color:white;
+    margin-top:8px;
+  }
+
+  .btn{
+    width:100%;
+    border:none;
+    border-radius:22px;
+    padding:16px 18px;
+    background:linear-gradient(90deg,var(--blue1),var(--blue2));
+    color:white;
+    font-size:18px;
+    font-weight:800;
+    cursor:pointer;
+    box-shadow:0 10px 26px rgba(24,119,255,.28);
+  }
+
+  .grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+    margin-top:16px;
+  }
+
+  .card{
+    background:rgba(10,24,44,.78);
+    border:1px solid var(--line);
+    border-radius:20px;
+    min-height:92px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    text-align:center;
+    font-weight:800;
+    font-size:18px;
+    cursor:pointer;
+    box-shadow:0 0 14px rgba(24,119,255,.08);
+  }
+
+  .telegram{
+    margin-top:12px;
+  }
+
+  .game-wrap{
+    width:100%;
+    min-height:100vh;
+    display:none;
+    justify-content:center;
+    align-items:center;
+    padding:86px 18px 24px;
+  }
+
+  .game{
+    position:relative;
+    width:100%;
+    max-width:380px;
+    min-height:620px;
+    background:rgba(7,17,31,.72);
+    border:1px solid var(--line);
+    border-radius:30px;
+    box-shadow:0 0 24px rgba(24,119,255,.12);
+    backdrop-filter:blur(8px);
+    -webkit-backdrop-filter:blur(8px);
+    padding:20px 18px 24px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+  }
+
+  .top-actions{
+    width:100%;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:14px;
+  }
+
+  .mini-btn{
+    width:92px;
+    padding:12px 12px;
+    border:none;
+    border-radius:20px;
+    background:linear-gradient(90deg,var(--blue1),var(--blue2));
+    color:white;
+    font-size:16px;
+    font-weight:800;
+    cursor:pointer;
+    box-shadow:0 10px 22px rgba(24,119,255,.26);
+  }
+
+  .game-title{
+    margin-top:8px;
+    font-size:24px;
+    font-weight:900;
+    letter-spacing:.4px;
+    text-align:center;
+  }
+
+  .num-zone{
+    flex:1;
+    width:100%;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    text-align:center;
+    gap:16px;
+    padding-top:10px;
+    padding-bottom:10px;
+  }
+
+  .num{
+    font-size:128px;
+    line-height:1;
+    font-weight:900;
+    color:#ffffff;
+    text-shadow:0 0 26px rgba(255,255,255,.18);
+    min-height:128px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+
+  .tip{
+    min-height:28px;
+    font-size:22px;
+    font-weight:800;
+    color:#dfe9f7;
+  }
+
+  .hint{
+    color:var(--muted);
+    font-size:14px;
+    margin-top:-4px;
+  }
+
+  .bottom{
+    width:100%;
+    margin-top:auto;
+  }
+
+  .cups{
+    display:flex;
+    justify-content:center;
+    gap:14px;
+    margin-top:10px;
+    margin-bottom:14px;
+  }
+
+  .cup{
+    width:78px;
+    height:78px;
+    border-radius:50%;
+    background:linear-gradient(180deg,#ffe28a,#e7b62a);
+    color:#2d1d00;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:28px;
+    font-weight:900;
+    box-shadow:0 0 18px rgba(255,216,107,.28);
+    border:2px solid rgba(255,255,255,.22);
+    transition:all .18s ease;
+  }
+
+  .active{
+    outline:4px solid var(--green);
+    transform:translateY(-6px) scale(1.04);
+    box-shadow:0 0 24px rgba(66,255,123,.42);
+  }
+
+  .hidden{
+    display:none !important;
+  }
+</style>
+</head>
+<body>
+
+<canvas id="stars"></canvas>
+
+<div class="settings" onclick="setID()">⚙️</div>
+<div id="status"></div>
+
+<!-- LOGIN -->
+<div id="loginScreen" class="screen">
+  <div class="panel">
+    <div class="title">SAVAS VIP</div>
+    <div class="sub">Parol bilan kirish</div>
+    <input id="pass" type="password" placeholder="7777">
+    <button class="btn" onclick="login()">Kirish</button>
+    <a class="support" href="https://t.me/savasuz" target="_blank">Qo'llab-quvvatlash</a>
+  </div>
+</div>
+
+<!-- MENU -->
+<div id="menuScreen" class="screen hidden">
+  <div class="panel">
+    <div class="title">SAVAS FULL PANEL</div>
+    <div class="grid">
+      <div class="card" onclick="openGame('apple')">🍎 Apple</div>
+      <div class="card" onclick="openGame('thimbles')">🟣 Thimbles</div>
+      <div class="card" onclick="openGame('kamikaze')">✈️ Kamikaze</div>
+      <div class="card" onclick="openGame('swamp')">🐸 Swamp</div>
+    </div>
+    <div class="card telegram" onclick="window.open('https://t.me/+B7nEGQy2FGxhODgy','_blank')">🔷 Telegram</div>
+  </div>
+</div>
+
+<!-- APPLE -->
+<div id="appleScreen" class="game-wrap">
+  <div class="game">
+    <div class="top-actions">
+      <button class="mini-btn" onclick="goBack()">Orqaga</button>
+      <button class="mini-btn" onclick="resetNum('appleNum','appleTip')">Restart</button>
+    </div>
+    <div class="game-title">APPLE</div>
+    <div class="num-zone">
+      <div id="appleNum" class="num">0</div>
+      <div id="appleTip" class="tip">0 chi qatorni bosing!</div>
+      <div class="hint">1 dan 5 gacha</div>
+    </div>
+    <div class="bottom">
+      <button class="btn" onclick="spinNum('appleNum','appleTip',5)">NEXT</button>
+    </div>
+  </div>
+</div>
+
+<!-- KAMIKAZE -->
+<div id="kamikazeScreen" class="game-wrap">
+  <div class="game">
+    <div class="top-actions">
+      <button class="mini-btn" onclick="goBack()">Orqaga</button>
+      <button class="mini-btn" onclick="resetNum('kamikazeNum','kamikazeTip')">Restart</button>
+    </div>
+    <div class="game-title">KAMIKAZE</div>
+    <div class="num-zone">
+      <div id="kamikazeNum" class="num">0</div>
+      <div id="kamikazeTip" class="tip">0 chi qatorni bosing!</div>
+      <div class="hint">1 dan 5 gacha</div>
+    </div>
+    <div class="bottom">
+      <button class="btn" onclick="spinNum('kamikazeNum','kamikazeTip',5)">NEXT</button>
+    </div>
+  </div>
+</div>
+
+<!-- SWAMP -->
+<div id="swampScreen" class="game-wrap">
+  <div class="game">
+    <div class="top-actions">
+      <button class="mini-btn" onclick="goBack()">Orqaga</button>
+      <button class="mini-btn" onclick="resetNum('swampNum','swampTip')">Restart</button>
+    </div>
+    <div class="game-title">SWAMP</div>
+    <div class="num-zone">
+      <div id="swampNum" class="num">0</div>
+      <div id="swampTip" class="tip">0 chi qatorni bosing!</div>
+      <div class="hint">1 dan 5 gacha</div>
+    </div>
+    <div class="bottom">
+      <button class="btn" onclick="spinNum('swampNum','swampTip',5)">NEXT</button>
+    </div>
+  </div>
+</div>
+
+<!-- THIMBLES -->
+<div id="thimblesScreen" class="game-wrap">
+  <div class="game">
+    <div class="top-actions">
+      <button class="mini-btn" onclick="goBack()">Orqaga</button>
+      <button class="mini-btn" onclick="resetThimbles()">Restart</button>
+    </div>
+    <div class="game-title">THIMBLES</div>
+    <div class="num-zone">
+      <div class="cups">
+        <div id="cup1" class="cup">1</div>
+        <div id="cup2" class="cup">2</div>
+        <div id="cup3" class="cup">3</div>
+      </div>
+      <div id="thimblesTip" class="tip">0 chi variantni bosing!</div>
+      <div class="hint">1 dan 3 gacha</div>
+    </div>
+    <div class="bottom">
+      <button class="btn" onclick="spinThimbles()">NEXT</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const loginScreen = document.getElementById("loginScreen");
+  const menuScreen = document.getElementById("menuScreen");
+  const appleScreen = document.getElementById("appleScreen");
+  const thimblesScreen = document.getElementById("thimblesScreen");
+  const kamikazeScreen = document.getElementById("kamikazeScreen");
+  const swampScreen = document.getElementById("swampScreen");
+
+  const statusEl = document.getElementById("status");
+  let active = false;
+
+  function login(){
+    const p = document.getElementById("pass").value.trim();
+    if(p === "7777"){
+      loginScreen.classList.add("hidden");
+      menuScreen.classList.remove("hidden");
+    }else{
+      alert("❌ Parol xato");
+    }
+  }
+
+  function setID(){
+    const id = prompt("Betwinner ID yozing");
+    if(!id) return;
+
+    active = /^\d{10}$/.test(id);
+    updateStatus();
+  }
+
+  function updateStatus(){
+    const d = new Date();
+    const h = String(d.getHours()).padStart(2,'0');
+    const m = String(d.getMinutes()).padStart(2,'0');
+
+    if(active){
+      statusEl.innerHTML = "🟢 Hack Active " + h + ":" + m;
+      statusEl.style.color = "lime";
+    }else{
+      statusEl.innerHTML = "🔴 Hack No Active " + h + ":" + m;
+      statusEl.style.color = "red";
+    }
+  }
+  setInterval(updateStatus,1000);
+
+  function hideAll(){
+    menuScreen.classList.add("hidden");
+    appleScreen.style.display = "none";
+    thimblesScreen.style.display = "none";
+    kamikazeScreen.style.display = "none";
+    swampScreen.style.display = "none";
+  }
+
+  function openGame(name){
+    hideAll();
+    if(name === "apple") appleScreen.style.display = "flex";
+    if(name === "thimbles") thimblesScreen.style.display = "flex";
+    if(name === "kamikaze") kamikazeScreen.style.display = "flex";
+    if(name === "swamp") swampScreen.style.display = "flex";
+  }
+
+  function goBack(){
+    hideAll();
+    menuScreen.classList.remove("hidden");
+  }
+
+  function spinNum(numId, tipId, max){
+    let i = 0;
+    const el = document.getElementById(numId);
+    const tip = document.getElementById(tipId);
+
+    const inter = setInterval(()=>{
+      const val = Math.floor(Math.random()*max)+1;
+      el.innerText = val;
+      tip.innerText = val + " chi qatorni bosing!";
+      i++;
+      if(i > 10){
+        clearInterval(inter);
+      }
+    },150);
+  }
+
+  function resetNum(numId, tipId){
+    document.getElementById(numId).innerText = 0;
+    document.getElementById(tipId).innerText = "0 chi qatorni bosing!";
+  }
+
+  function spinThimbles(){
+    let i = 0;
+    const tip = document.getElementById("thimblesTip");
+    const cups = [document.getElementById("cup1"), document.getElementById("cup2"), document.getElementById("cup3")];
+
+    const inter = setInterval(()=>{
+      const val = Math.floor(Math.random()*3)+1;
+      cups.forEach(c=>c.classList.remove("active"));
+      document.getElementById("cup"+val).classList.add("active");
+      tip.innerText = val + " chi variantni bosing!";
+      i++;
+      if(i > 10){
+        clearInterval(inter);
+      }
+    },150);
+  }
+
+  function resetThimbles(){
+    [cup1,cup2,cup3].forEach(c=>c.classList.remove("active"));
+    document.getElementById("thimblesTip").innerText = "0 chi variantni bosing!";
+  }
+
+  /* stars */
+  const c = document.getElementById("stars");
+  const ctx = c.getContext("2d");
+
+  function resize(){
+    c.width = window.innerWidth;
+    c.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener("resize", resize);
+
+  const stars = Array(120).fill(0).map(()=>({
+    x: Math.random()*c.width,
+    y: Math.random()*c.height
+  }));
+
+  function draw(){
+    ctx.fillStyle = "black";
+    ctx.fillRect(0,0,c.width,c.height);
+
+    ctx.fillStyle = "white";
+    stars.forEach(s=>{
+      ctx.fillRect(s.x,s.y,2,2);
+      s.y += 0.45;
+      if(s.y > c.height){
+        s.y = 0;
+        s.x = Math.random()*c.width;
+      }
+    });
+
+    requestAnimationFrame(draw);
+  }
+  draw();
+</script>
+
+</body>
+</html>
