@@ -54,6 +54,15 @@
     border:1px solid rgba(85,176,255,.3);
     box-shadow:0 12px 35px rgba(0,0,0,.35);
     backdrop-filter:blur(12px);
+    overflow:hidden;
+  }
+
+  .settings-icon{
+    width:46px;
+    height:46px;
+    display:block;
+    border-radius:50%;
+    object-fit:cover;
   }
 
   #status{
@@ -386,6 +395,7 @@
     .game{min-height:590px;border-radius:26px}
     .num{font-size:112px}
     .settings{top:12px;left:12px;width:44px;height:44px;font-size:24px}
+    .settings-icon{width:42px;height:42px}
     .telegram{top:12px;right:12px;width:44px;height:44px}
     .telegram-icon{width:42px;height:42px}
   }
@@ -395,7 +405,9 @@
 
 <canvas id="stars"></canvas>
 
-<div class="settings" onclick="setID()">⚙️</div>
+<div class="settings" onclick="setID()" aria-label="Sozlamalarni ochish">
+  <img class="settings-icon" src="assets/settings-icon.jpeg" alt="Sozlamalar">
+</div>
 <div class="telegram" onclick="window.open('https://t.me/+B7nEGQy2FGxhODgy','_blank')" aria-label="Telegram kanalini ochish">
   <img class="telegram-icon" src="assets/telegram-icon.jpeg" alt="Telegram">
 </div>
