@@ -166,7 +166,8 @@
     background:rgba(10,24,44,.78);
     border:1px solid var(--line);
     border-radius:20px;
-    min-height:150px;
+    min-height:0;
+    aspect-ratio:1.28 / 1;
     display:flex;
     justify-content:center;
     align-items:flex-end;
@@ -189,6 +190,11 @@
     transition:transform .35s ease,filter .35s ease;
   }
 
+  .card img[alt="Apple"]{object-position:50% 48%}
+  .card img[alt="Thimbles"]{object-position:50% 56%}
+  .card img[alt="Kamikaze"]{object-position:48% 50%}
+  .card img[alt="Swamp"]{object-position:50% 48%}
+
   .card:hover img{transform:scale(1.06);filter:saturate(1.12)}
 
   .card span{
@@ -204,6 +210,7 @@
   .telegram{
     margin-top:12px;
     min-height:74px;
+    aspect-ratio:auto;
     align-items:center;
   }
 
