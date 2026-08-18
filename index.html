@@ -228,6 +228,18 @@
     align-items:center;
     justify-content:center;
     text-align:center;
+    gap:10px;
+  }
+
+  .telegram-icon{
+    width:42px;
+    height:42px;
+    flex:0 0 42px;
+    display:block;
+  }
+
+  .telegram-text{
+    font-weight:800;
   }
 
   .game-wrap{
@@ -388,7 +400,10 @@
       <div class="card" onclick="openGame('kamikaze')"><img src="assets/kamikaze.webp" alt="Kamikaze"><div class="card-label">Kamikaze</div></div>
       <div class="card" onclick="openGame('swamp')"><img src="assets/swamp.webp" alt="Swamp Land"><div class="card-label">Swamp Land</div></div>
     </div>
-    <div class="card telegram" onclick="window.open('https://t.me/+B7nEGQy2FGxhODgy','_blank')">🔷 Telegram</div>
+    <div class="card telegram" onclick="window.open('https://t.me/+B7nEGQy2FGxhODgy','_blank')">
+      <span id="telegramLottie" class="telegram-icon" aria-hidden="true"></span>
+      <span class="telegram-text">Telegram</span>
+    </div>
   </div>
 </div>
 
@@ -472,7 +487,19 @@
   </div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.12.2/lottie.min.js"></script>
 <script>
+  const telegramLottie = document.getElementById("telegramLottie");
+  if(window.lottie && telegramLottie){
+    lottie.loadAnimation({
+      container: telegramLottie,
+      renderer: "svg",
+      loop: true,
+      autoplay: true,
+      path: "assets/telegram.json"
+    });
+  }
+
   const menuScreen = document.getElementById("menuScreen");
   const appleScreen = document.getElementById("appleScreen");
   const thimblesScreen = document.getElementById("thimblesScreen");
