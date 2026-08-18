@@ -222,24 +222,28 @@
   }
 
   .telegram{
-    margin-top:12px;
-    min-height:220px;
-    aspect-ratio:auto;
-    align-items:center;
-    justify-content:center;
-    text-align:center;
-    gap:10px;
+    position:fixed;
+    top:16px;
+    right:16px;
+    z-index:30;
+    width:48px;
+    height:48px;
+    display:grid;
+    place-items:center;
+    overflow:hidden;
+    cursor:pointer;
+    border-radius:16px;
+    background:rgba(8,20,38,.72);
+    border:1px solid rgba(85,176,255,.3);
+    box-shadow:0 12px 35px rgba(0,0,0,.35);
+    backdrop-filter:blur(12px);
+    -webkit-backdrop-filter:blur(12px);
   }
 
   .telegram-icon{
-    width:200px;
-    height:200px;
-    flex:0 0 200px;
+    width:46px;
+    height:46px;
     display:block;
-  }
-
-  .telegram-text{
-    font-weight:800;
   }
 
   .game-wrap{
@@ -380,6 +384,8 @@
     .game{min-height:590px;border-radius:26px}
     .num{font-size:112px}
     .settings{top:12px;left:12px;width:44px;height:44px;font-size:24px}
+    .telegram{top:12px;right:12px;width:44px;height:44px}
+    .telegram-icon{width:42px;height:42px}
   }
 </style>
 </head>
@@ -388,6 +394,9 @@
 <canvas id="stars"></canvas>
 
 <div class="settings" onclick="setID()">⚙️</div>
+<div class="telegram" onclick="window.open('https://t.me/+B7nEGQy2FGxhODgy','_blank')" aria-label="Telegram kanalini ochish">
+  <span id="telegramLottie" class="telegram-icon" aria-hidden="true"></span>
+</div>
 <div id="status"></div>
 
 <!-- MENU -->
@@ -399,10 +408,6 @@
       <div class="card" onclick="openGame('thimbles')"><img src="assets/thimbles.webp" alt="Thimbles"><div class="card-label">Thimbles</div></div>
       <div class="card" onclick="openGame('kamikaze')"><img src="assets/kamikaze.webp" alt="Kamikaze"><div class="card-label">Kamikaze</div></div>
       <div class="card" onclick="openGame('swamp')"><img src="assets/swamp.webp" alt="Swamp Land"><div class="card-label">Swamp Land</div></div>
-    </div>
-    <div class="card telegram" onclick="window.open('https://t.me/+B7nEGQy2FGxhODgy','_blank')">
-      <span id="telegramLottie" class="telegram-icon" aria-hidden="true"></span>
-      <span class="telegram-text">Telegram</span>
     </div>
   </div>
 </div>
