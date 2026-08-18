@@ -67,19 +67,12 @@
 
   #status{
     position:fixed;
-    top:16px;
+    top:8px;
     left:50%;
     transform:translateX(-50%);
-    font-weight:800;
-    font-size:15px;
     z-index:30;
-    text-align:center;
-    white-space:nowrap;
-    padding:10px 16px;
-    border-radius:99px;
-    background:rgba(8,20,38,.7);
-    border:1px solid rgba(85,176,255,.22);
-    backdrop-filter:blur(12px);
+    width:72px;
+    height:72px;
   }
 
   .support{
@@ -506,6 +499,7 @@
   </div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.12.2/lottie.min.js"></script>
 <script>
   const menuScreen = document.getElementById("menuScreen");
   const appleScreen = document.getElementById("appleScreen");
@@ -515,6 +509,19 @@
 
   const statusEl = document.getElementById("status");
   let active = false;
+  let statusAnimation = null;
+  let lastStatusState = null;
+
+  if(window.lottie){
+    statusAnimation = lottie.loadAnimation({
+      container: statusEl,
+      renderer: "svg",
+      loop: false,
+      autoplay: false,
+      path: "assets/go-online.json"
+    });
+    statusAnimation.addEventListener("DOMLoaded",()=>statusAnimation.goToAndStop(0,true));
+  }
 
   function setID(){
     const id = prompt("Betwinner ID yozing");
@@ -525,17 +532,10 @@
   }
 
   function updateStatus(){
-    const d = new Date();
-    const h = String(d.getHours()).padStart(2,'0');
-    const m = String(d.getMinutes()).padStart(2,'0');
-
-    if(active){
-      statusEl.innerHTML = "🟢 Analyzer Active " + h + ":" + m;
-      statusEl.style.color = "lime";
-    }else{
-      statusEl.innerHTML = "🔴 Analyzer Offline " + h + ":" + m;
-      statusEl.style.color = "red";
-    }
+    if(!statusAnimation || lastStatusState === active) return;
+    if(active) statusAnimation.playSegments([0,54],true);
+    else statusAnimation.goToAndStop(0,true);
+    lastStatusState = active;
   }
   setInterval(updateStatus,1000);
 
