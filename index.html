@@ -613,6 +613,23 @@
     color:#f8fbff;
     font-size:13px;
     line-height:1.5;
+    display:flex;
+    align-items:flex-start;
+    gap:10px;
+  }
+
+  .rules-warning-icon{
+    width:46px;
+    height:46px;
+    flex:0 0 46px;
+    margin-top:1px;
+  }
+
+  .rules-warning-copy strong{
+    display:block;
+    margin-bottom:3px;
+    color:#ffffff;
+    font-size:14px;
   }
 
   .rules-close{
@@ -687,7 +704,15 @@
       <li>BetWinner ID’ni ⚙️ Settings orqali kiriting.</li>
       <li>ID muvaffaqiyatli tekshirilgandan keyin tizim Online holatiga o‘tadi.</li>
     </ul>
-    <div class="rules-warning">⚠️ Bashoratlar yutuqni kafolatlamaydi.<br>O‘yin moliyaviy xavf bilan bog‘liq. 18+</div>
+    <div class="rules-warning">
+      <div id="warningAnimation" class="rules-warning-icon" aria-hidden="true"></div>
+      <div class="rules-warning-copy">
+        <strong>Muhim ma’lumot</strong>
+        Bashoratchidan foydalanish uchun ID’ingizni to‘g‘ri kiriting.<br>
+        Tizim faollashgach barcha funksiyalardan foydalanishingiz mumkin.<br>
+        Bashoratlar tavsiyaviy xarakterga ega • 18+
+      </div>
+    </div>
     <button class="rules-close" type="button" onclick="closeRules()">Tushundim</button>
   </div>
 </div>
@@ -790,6 +815,7 @@
   const swampScreen = document.getElementById("swampScreen");
   const rulesModal = document.getElementById("rulesModal");
   const rulesRobot = document.getElementById("rulesRobot");
+  const warningAnimation = document.getElementById("warningAnimation");
 
   function openRules(){
     rulesModal.classList.remove("hidden");
@@ -812,6 +838,14 @@
       loop:true,
       autoplay:true,
       path:"assets/robot-working.json"
+    });
+
+    lottie.loadAnimation({
+      container:warningAnimation,
+      renderer:"svg",
+      loop:true,
+      autoplay:true,
+      path:"assets/warning.json"
     });
 
     statusAnimation = lottie.loadAnimation({
