@@ -419,25 +419,48 @@
   .cups{
     display:flex;
     justify-content:center;
-    gap:14px;
+    gap:10px;
     margin-top:10px;
     margin-bottom:14px;
   }
 
   .cup{
-    width:78px;
-    height:78px;
-    border-radius:50%;
-    background:linear-gradient(145deg,#fff0a7,#e2a91e);
-    color:#2d1d00;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:28px;
-    font-weight:900;
-    box-shadow:0 14px 26px rgba(0,0,0,.25),0 0 22px rgba(255,216,107,.28),inset 0 2px 0 rgba(255,255,255,.55);
-    border:2px solid rgba(255,255,255,.22);
+    position:relative;
+    width:88px;
+    height:88px;
+    border:0;
+    background:transparent;
+    display:grid;
+    place-items:center;
     transition:all .18s ease;
+  }
+
+  .cup img{
+    width:100%;
+    height:100%;
+    object-fit:contain;
+    filter:drop-shadow(0 12px 12px rgba(0,0,0,.38));
+    pointer-events:none;
+  }
+
+  .cup span{
+    position:absolute;
+    inset:0;
+    display:grid;
+    place-items:center;
+    padding-top:8px;
+    color:#3c1700;
+    font-size:27px;
+    font-weight:900;
+    text-shadow:0 1px 1px rgba(255,246,171,.9);
+    pointer-events:none;
+  }
+
+  .cup.active{
+    outline:none;
+    transform:translateY(-8px) scale(1.08);
+    box-shadow:none;
+    filter:drop-shadow(0 0 13px rgba(66,255,123,.95));
   }
 
   .active{
@@ -571,9 +594,9 @@
     <div class="num-zone">
       <div class="scan-label">CUP SCANNER</div>
       <div class="cups">
-        <div id="cup1" class="cup">1</div>
-        <div id="cup2" class="cup">2</div>
-        <div id="cup3" class="cup">3</div>
+        <div id="cup1" class="cup"><img src="assets/thimble-cup.webp" alt="1-stakan"><span>1</span></div>
+        <div id="cup2" class="cup"><img src="assets/thimble-cup.webp" alt="2-stakan"><span>2</span></div>
+        <div id="cup3" class="cup"><img src="assets/thimble-cup.webp" alt="3-stakan"><span>3</span></div>
       </div>
       <div id="thimblesTip" class="tip">0 chi variantni bosing!</div>
       <div class="hint">1 dan 3 gacha</div>
