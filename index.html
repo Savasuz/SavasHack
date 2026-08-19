@@ -77,15 +77,15 @@
 
   .language-switcher{
     position:fixed;
-    top:25px;
-    right:72px;
+    top:84px;
+    left:50%;
+    transform:translateX(-50%);
     z-index:31;
-    height:30px;
     display:flex;
     align-items:center;
-    gap:5px;
-    padding:0 8px;
-    border-radius:12px;
+    gap:4px;
+    padding:4px;
+    border-radius:14px;
     background:rgba(8,20,38,.82);
     border:1px solid rgba(85,176,255,.32);
     box-shadow:0 8px 24px rgba(0,0,0,.3),0 0 14px rgba(51,214,255,.08);
@@ -93,22 +93,43 @@
     -webkit-backdrop-filter:blur(12px);
   }
 
-  .language-switcher span{font-size:14px;line-height:1}
-
-  .language-switcher select{
-    appearance:none;
-    -webkit-appearance:none;
-    border:0;
-    outline:0;
-    color:#f4f8ff;
-    background:transparent;
-    font-size:12px;
-    font-weight:800;
+  .language-option{
+    min-width:53px;
+    height:27px;
+    padding:0 7px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:4px;
+    border-radius:10px;
+    border:1px solid transparent;
+    color:#9cafc8;
+    background:rgba(2,9,20,.5);
+    font-size:11px;
+    font-weight:900;
+    line-height:1;
     cursor:pointer;
-    padding:0 1px;
+    opacity:.58;
+    transition:opacity .18s ease,color .18s ease,border-color .18s ease,box-shadow .18s ease,background .18s ease;
   }
 
-  .language-switcher select option{background:#07111f;color:#f4f8ff}
+  .language-option .flag{
+    width:17px;
+    display:inline-flex;
+    justify-content:center;
+    font-size:15px;
+    line-height:1;
+  }
+
+  .language-option:hover{opacity:.86;color:#eef7ff}
+
+  .language-option.selected{
+    opacity:1;
+    color:#ffffff;
+    border-color:rgba(85,205,255,.88);
+    background:linear-gradient(145deg,rgba(30,133,255,.34),rgba(38,55,135,.44));
+    box-shadow:0 0 15px rgba(51,183,255,.34),inset 0 1px 0 rgba(255,255,255,.16);
+  }
 
   .support{
     display:block;
@@ -700,7 +721,8 @@
     .settings-icon{width:42px;height:42px}
     .telegram{top:12px;right:12px;width:44px;height:44px}
     .telegram-icon{width:42px;height:42px}
-    .language-switcher{top:20px;right:66px;height:28px}
+    .language-switcher{top:80px;gap:3px;padding:3px}
+    .language-option{min-width:50px;height:26px;padding:0 6px}
   }
 </style>
 </head>
@@ -715,14 +737,11 @@
   <img class="telegram-icon" src="assets/telegram-flat.jpeg" alt="Telegram">
 </div>
 <div id="status"></div>
-<label class="language-switcher" aria-label="Tilni tanlash">
-  <span aria-hidden="true">🌐</span>
-  <select id="languageSelect" onchange="setLanguage(this.value)">
-    <option value="uz">UZ</option>
-    <option value="ru">RU</option>
-    <option value="en">EN</option>
-  </select>
-</label>
+<div class="language-switcher" role="group" aria-label="Tilni tanlash">
+  <button class="language-option" type="button" data-lang="uz" onclick="setLanguage('uz')"><span class="flag" aria-hidden="true">🇺🇿</span>UZ</button>
+  <button class="language-option" type="button" data-lang="ru" onclick="setLanguage('ru')"><span class="flag" aria-hidden="true">🇷🇺</span>RU</button>
+  <button class="language-option" type="button" data-lang="en" onclick="setLanguage('en')"><span class="flag" aria-hidden="true">🇬🇧</span>EN</button>
+</div>
 
 <!-- MENU -->
 <div id="menuScreen" class="screen">
@@ -918,7 +937,11 @@
 
   function applyLanguage(){
     document.documentElement.lang = currentLanguage;
-    document.getElementById("languageSelect").value = currentLanguage;
+    document.querySelectorAll(".language-option").forEach(button=>{
+      const selected = button.dataset.lang === currentLanguage;
+      button.classList.toggle("selected",selected);
+      button.setAttribute("aria-pressed",String(selected));
+    });
     document.querySelectorAll("[data-i18n]").forEach(el=>{
       el.textContent = t(el.dataset.i18n);
     });
