@@ -535,6 +535,94 @@
     filter:drop-shadow(0 0 13px rgba(66,255,123,.95));
   }
 
+  .rules-btn{
+    margin-top:14px;
+    padding:9px 16px;
+    border-radius:14px;
+    border:1px solid rgba(85,176,255,.34);
+    background:rgba(7,20,38,.82);
+    color:#f4f8ff;
+    font-size:14px;
+    font-weight:800;
+    cursor:pointer;
+    box-shadow:0 0 18px rgba(51,214,255,.1),inset 0 1px 0 rgba(255,255,255,.06);
+    transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease;
+  }
+
+  .rules-btn:hover{
+    transform:translateY(-2px);
+    border-color:rgba(51,214,255,.72);
+    box-shadow:0 0 22px rgba(51,214,255,.2);
+  }
+
+  .rules-overlay{
+    position:fixed;
+    inset:0;
+    z-index:100;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:22px;
+    background:rgba(0,3,10,.78);
+    backdrop-filter:blur(9px);
+    -webkit-backdrop-filter:blur(9px);
+  }
+
+  .rules-modal{
+    width:100%;
+    max-width:360px;
+    padding:22px 20px 19px;
+    border-radius:24px;
+    border:1px solid rgba(75,155,255,.48);
+    background:linear-gradient(150deg,rgba(8,24,45,.98),rgba(2,8,18,.98));
+    color:#f4f8ff;
+    text-align:left;
+    box-shadow:0 24px 70px rgba(0,0,0,.65),0 0 32px rgba(51,150,255,.22),inset 0 1px 0 rgba(255,255,255,.06);
+  }
+
+  .rules-title{
+    margin:0 0 17px;
+    color:#ffffff;
+    font-size:19px;
+    line-height:1.3;
+    text-align:center;
+  }
+
+  .rules-list{
+    margin:0;
+    padding-left:20px;
+    color:#eef5ff;
+    font-size:14px;
+    line-height:1.55;
+  }
+
+  .rules-list li+li{margin-top:8px}
+
+  .rules-warning{
+    margin:18px 0 16px;
+    padding:12px 13px;
+    border-radius:15px;
+    border:1px solid rgba(255,189,75,.26);
+    background:rgba(255,151,30,.07);
+    color:#f8fbff;
+    font-size:13px;
+    line-height:1.5;
+  }
+
+  .rules-close{
+    display:block;
+    margin:0 auto;
+    padding:10px 20px;
+    border:0;
+    border-radius:14px;
+    background:linear-gradient(90deg,var(--blue1),var(--blue2));
+    color:#ffffff;
+    font-size:14px;
+    font-weight:800;
+    cursor:pointer;
+    box-shadow:0 10px 26px rgba(45,108,255,.3);
+  }
+
   .active{
     outline:4px solid var(--green);
     transform:translateY(-6px) scale(1.04);
@@ -579,6 +667,21 @@
       <div class="card" onclick="openGame('kamikaze')"><img src="assets/kamikaze.webp" alt="Kamikaze"><div class="card-label">Kamikaze</div></div>
       <div class="card" onclick="openGame('swamp')"><img src="assets/swamp.webp" alt="Swamp Land"><div class="card-label">Swamp Land</div></div>
     </div>
+    <button class="rules-btn" type="button" onclick="openRules()">📋 Qoidalar</button>
+  </div>
+</div>
+
+<div id="rulesModal" class="rules-overlay hidden" onclick="closeRules(event)">
+  <div class="rules-modal" role="dialog" aria-modal="true" aria-labelledby="rulesTitle">
+    <h2 id="rulesTitle" class="rules-title">🤖 Bashoratchidan foydalanish qoidalari</h2>
+    <ul class="rules-list">
+      <li>Ro‘yxatdan o‘tishda promokod: <strong>SAVAS</strong></li>
+      <li>Minimal depozit: <strong>5$ (~60 000 so‘m)</strong></li>
+      <li>BetWinner ID’ni ⚙️ Settings orqali kiriting.</li>
+      <li>ID muvaffaqiyatli tekshirilgandan keyin tizim Online holatiga o‘tadi.</li>
+    </ul>
+    <div class="rules-warning">⚠️ Bashoratlar yutuqni kafolatlamaydi.<br>O‘yin moliyaviy xavf bilan bog‘liq. 18+</div>
+    <button class="rules-close" type="button" onclick="closeRules()">Tushundim</button>
   </div>
 </div>
 
@@ -678,6 +781,16 @@
   const thimblesScreen = document.getElementById("thimblesScreen");
   const kamikazeScreen = document.getElementById("kamikazeScreen");
   const swampScreen = document.getElementById("swampScreen");
+  const rulesModal = document.getElementById("rulesModal");
+
+  function openRules(){
+    rulesModal.classList.remove("hidden");
+  }
+
+  function closeRules(event){
+    if(event && event.target !== rulesModal) return;
+    rulesModal.classList.add("hidden");
+  }
 
   const statusEl = document.getElementById("status");
   let active = false;
