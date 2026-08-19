@@ -588,6 +588,12 @@
     text-align:center;
   }
 
+  .rules-robot{
+    width:150px;
+    height:82px;
+    margin:0 auto 8px;
+  }
+
   .rules-list{
     margin:0;
     padding-left:20px;
@@ -673,9 +679,10 @@
 
 <div id="rulesModal" class="rules-overlay hidden" onclick="closeRules(event)">
   <div class="rules-modal" role="dialog" aria-modal="true" aria-labelledby="rulesTitle">
+    <div id="rulesRobot" class="rules-robot" aria-hidden="true"></div>
     <h2 id="rulesTitle" class="rules-title">🤖 Bashoratchidan foydalanish qoidalari</h2>
     <ul class="rules-list">
-      <li>Ro‘yxatdan o‘tishda promokod: <strong>SAVAS</strong></li>
+      <li>Ro‘yxatdan o‘tishda promokod: <strong>SUNET</strong></li>
       <li>Minimal depozit: <strong>5$ (~60 000 so‘m)</strong></li>
       <li>BetWinner ID’ni ⚙️ Settings orqali kiriting.</li>
       <li>ID muvaffaqiyatli tekshirilgandan keyin tizim Online holatiga o‘tadi.</li>
@@ -782,6 +789,7 @@
   const kamikazeScreen = document.getElementById("kamikazeScreen");
   const swampScreen = document.getElementById("swampScreen");
   const rulesModal = document.getElementById("rulesModal");
+  const rulesRobot = document.getElementById("rulesRobot");
 
   function openRules(){
     rulesModal.classList.remove("hidden");
@@ -798,6 +806,14 @@
   let lastStatusState = null;
 
   if(window.lottie){
+    lottie.loadAnimation({
+      container:rulesRobot,
+      renderer:"svg",
+      loop:true,
+      autoplay:true,
+      path:"assets/robot-working.json"
+    });
+
     statusAnimation = lottie.loadAnimation({
       container: statusEl,
       renderer: "svg",
