@@ -75,6 +75,41 @@
     height:72px;
   }
 
+  .language-switcher{
+    position:fixed;
+    top:25px;
+    right:72px;
+    z-index:31;
+    height:30px;
+    display:flex;
+    align-items:center;
+    gap:5px;
+    padding:0 8px;
+    border-radius:12px;
+    background:rgba(8,20,38,.82);
+    border:1px solid rgba(85,176,255,.32);
+    box-shadow:0 8px 24px rgba(0,0,0,.3),0 0 14px rgba(51,214,255,.08);
+    backdrop-filter:blur(12px);
+    -webkit-backdrop-filter:blur(12px);
+  }
+
+  .language-switcher span{font-size:14px;line-height:1}
+
+  .language-switcher select{
+    appearance:none;
+    -webkit-appearance:none;
+    border:0;
+    outline:0;
+    color:#f4f8ff;
+    background:transparent;
+    font-size:12px;
+    font-weight:800;
+    cursor:pointer;
+    padding:0 1px;
+  }
+
+  .language-switcher select option{background:#07111f;color:#f4f8ff}
+
   .support{
     display:block;
     margin-top:12px;
@@ -665,6 +700,7 @@
     .settings-icon{width:42px;height:42px}
     .telegram{top:12px;right:12px;width:44px;height:44px}
     .telegram-icon{width:42px;height:42px}
+    .language-switcher{top:20px;right:66px;height:28px}
   }
 </style>
 </head>
@@ -679,6 +715,14 @@
   <img class="telegram-icon" src="assets/telegram-flat.jpeg" alt="Telegram">
 </div>
 <div id="status"></div>
+<label class="language-switcher" aria-label="Tilni tanlash">
+  <span aria-hidden="true">🌐</span>
+  <select id="languageSelect" onchange="setLanguage(this.value)">
+    <option value="uz">UZ</option>
+    <option value="ru">RU</option>
+    <option value="en">EN</option>
+  </select>
+</label>
 
 <!-- MENU -->
 <div id="menuScreen" class="screen">
@@ -690,29 +734,29 @@
       <div class="card" onclick="openGame('kamikaze')"><img src="assets/kamikaze.webp" alt="Kamikaze"><div class="card-label">Kamikaze</div></div>
       <div class="card" onclick="openGame('swamp')"><img src="assets/swamp.webp" alt="Swamp Land"><div class="card-label">Swamp Land</div></div>
     </div>
-    <button class="rules-btn" type="button" onclick="openRules()">📋 Qoidalar</button>
+    <button class="rules-btn" type="button" onclick="openRules()">📋 <span data-i18n="rules">Qoidalar</span></button>
   </div>
 </div>
 
 <div id="rulesModal" class="rules-overlay hidden" onclick="closeRules(event)">
   <div class="rules-modal" role="dialog" aria-modal="true" aria-labelledby="rulesTitle">
     <div id="rulesRobot" class="rules-robot" aria-hidden="true"></div>
-    <h2 id="rulesTitle" class="rules-title">🛡️ SUNET HACK — foydalanish shartlari</h2>
+    <h2 id="rulesTitle" class="rules-title">🛡️ <span data-i18n="rulesTitle">SUNET HACK — foydalanish shartlari</span></h2>
     <ul class="rules-list">
-      <li>Ro‘yxatdan o‘tishda promokod: <strong>SUNET</strong></li>
-      <li>Minimal depozit: <strong>5$ (~60 000 so‘m)</strong></li>
-      <li>BetWinner ID’ni ⚙️ Settings orqali kiriting.</li>
-      <li>ID muvaffaqiyatli tekshirilgandan keyin tizim Online holatiga o‘tadi.</li>
+      <li><span data-i18n="promoRule">Ro‘yxatdan o‘tishda promokod:</span> <strong>SUNET</strong></li>
+      <li><span data-i18n="depositRule">Minimal depozit:</span> <strong>5$ (~60 000 so‘m)</strong></li>
+      <li data-i18n="idSettingsRule">BetWinner ID’ni ⚙️ Settings orqali kiriting.</li>
+      <li data-i18n="onlineRule">ID muvaffaqiyatli tekshirilgandan keyin tizim Online holatiga o‘tadi.</li>
     </ul>
     <div class="rules-warning">
       <div id="warningAnimation" class="rules-warning-icon" aria-hidden="true"></div>
       <div class="rules-warning-copy">
-        <strong>SUNET HACK — Faollashtirish</strong>
-        ID’ingizni to‘g‘ri kiriting va tizimni faollashtiring.<br>
-        Mas’uliyat bilan foydalaning • 18+
+        <strong data-i18n="activationTitle">SUNET HACK — Faollashtirish</strong>
+        <span data-i18n="activationText">ID’ingizni to‘g‘ri kiriting va tizimni faollashtiring.</span><br>
+        <span data-i18n="responsible">Mas’uliyat bilan foydalaning • 18+</span>
       </div>
     </div>
-    <button class="rules-close" type="button" onclick="closeRules()">Tushundim</button>
+    <button class="rules-close" type="button" onclick="closeRules()" data-i18n="understood">Tushundim</button>
   </div>
 </div>
 
@@ -720,8 +764,8 @@
 <div id="appleScreen" class="game-wrap">
   <div class="game apple-game">
     <div class="top-actions">
-      <button class="mini-btn" onclick="goBack()">Orqaga</button>
-      <button class="mini-btn" onclick="resetNum('appleNum','appleTip','appleTrack')">Restart</button>
+      <button class="mini-btn" onclick="goBack()" data-i18n="back">Orqaga</button>
+      <button class="mini-btn" onclick="resetNum('appleNum','appleTip','appleTrack')" data-i18n="restart">Restart</button>
     </div>
     <div class="game-title">APPLE</div>
     <div class="num-zone">
@@ -729,11 +773,11 @@
       <div id="appleTrack" class="result-track">
         <div class="track-cell"><img src="assets/apple-medallion.webp" alt="Olma"></div><div class="track-cell"><img src="assets/apple-medallion.webp" alt="Olma"></div><div class="track-cell"><img src="assets/apple-medallion.webp" alt="Olma"></div><div class="track-cell"><img src="assets/apple-medallion.webp" alt="Olma"></div><div class="track-cell"><img src="assets/apple-medallion.webp" alt="Olma"></div>
       </div>
-      <div id="appleTip" class="tip">0 chi qatorni bosing!</div>
-      <div class="hint">1 dan 5 gacha</div>
+      <div id="appleTip" class="tip" data-result-type="row" data-result-value="0">0 chi qatorni bosing!</div>
+      <div class="hint" data-i18n="rangeFive">1 dan 5 gacha</div>
     </div>
     <div class="bottom">
-      <button class="btn" onclick="spinNum('appleNum','appleTip',5,'appleTrack')">SCAN</button>
+      <button class="btn" onclick="spinNum('appleNum','appleTip',5,'appleTrack')" data-i18n="scan">SCAN</button>
     </div>
   </div>
 </div>
@@ -742,8 +786,8 @@
 <div id="kamikazeScreen" class="game-wrap">
   <div class="game kamikaze-game">
     <div class="top-actions">
-      <button class="mini-btn" onclick="goBack()">Orqaga</button>
-      <button class="mini-btn" onclick="resetNum('kamikazeNum','kamikazeTip','kamikazeTrack')">Restart</button>
+      <button class="mini-btn" onclick="goBack()" data-i18n="back">Orqaga</button>
+      <button class="mini-btn" onclick="resetNum('kamikazeNum','kamikazeTip','kamikazeTrack')" data-i18n="restart">Restart</button>
     </div>
     <div class="game-title">KAMIKAZE</div>
     <div class="num-zone">
@@ -751,11 +795,11 @@
       <div id="kamikazeTrack" class="result-track">
         <div class="track-cell">1</div><div class="track-cell">2</div><div class="track-cell">3</div><div class="track-cell">4</div><div class="track-cell">5</div>
       </div>
-      <div id="kamikazeTip" class="tip">0 chi qatorni bosing!</div>
-      <div class="hint">1 dan 5 gacha</div>
+      <div id="kamikazeTip" class="tip" data-result-type="row" data-result-value="0">0 chi qatorni bosing!</div>
+      <div class="hint" data-i18n="rangeFive">1 dan 5 gacha</div>
     </div>
     <div class="bottom">
-      <button class="btn" onclick="spinNum('kamikazeNum','kamikazeTip',5,'kamikazeTrack')">SCAN</button>
+      <button class="btn" onclick="spinNum('kamikazeNum','kamikazeTip',5,'kamikazeTrack')" data-i18n="scan">SCAN</button>
     </div>
   </div>
 </div>
@@ -764,8 +808,8 @@
 <div id="swampScreen" class="game-wrap">
   <div class="game swamp-game">
     <div class="top-actions">
-      <button class="mini-btn" onclick="goBack()">Orqaga</button>
-      <button class="mini-btn" onclick="resetNum('swampNum','swampTip','swampTrack')">Restart</button>
+      <button class="mini-btn" onclick="goBack()" data-i18n="back">Orqaga</button>
+      <button class="mini-btn" onclick="resetNum('swampNum','swampTip','swampTrack')" data-i18n="restart">Restart</button>
     </div>
     <div class="game-title">SWAMP LAND</div>
     <div class="num-zone">
@@ -773,11 +817,11 @@
       <div id="swampTrack" class="result-track">
         <div class="track-cell"><img src="assets/lily-pad.webp" alt="Barg"></div><div class="track-cell"><img src="assets/lily-pad.webp" alt="Barg"></div><div class="track-cell"><img src="assets/lily-pad.webp" alt="Barg"></div><div class="track-cell"><img src="assets/lily-pad.webp" alt="Barg"></div><div class="track-cell"><img src="assets/lily-pad.webp" alt="Barg"></div>
       </div>
-      <div id="swampTip" class="tip">0 chi qatorni bosing!</div>
-      <div class="hint">1 dan 5 gacha</div>
+      <div id="swampTip" class="tip" data-result-type="row" data-result-value="0">0 chi qatorni bosing!</div>
+      <div class="hint" data-i18n="rangeFive">1 dan 5 gacha</div>
     </div>
     <div class="bottom">
-      <button class="btn" onclick="spinNum('swampNum','swampTip',5,'swampTrack')">SCAN</button>
+      <button class="btn" onclick="spinNum('swampNum','swampTip',5,'swampTrack')" data-i18n="scan">SCAN</button>
     </div>
   </div>
 </div>
@@ -786,8 +830,8 @@
 <div id="thimblesScreen" class="game-wrap">
   <div class="game thimbles-game">
     <div class="top-actions">
-      <button class="mini-btn" onclick="goBack()">Orqaga</button>
-      <button class="mini-btn" onclick="resetThimbles()">Restart</button>
+      <button class="mini-btn" onclick="goBack()" data-i18n="back">Orqaga</button>
+      <button class="mini-btn" onclick="resetThimbles()" data-i18n="restart">Restart</button>
     </div>
     <div class="game-title">THIMBLES</div>
     <div class="num-zone">
@@ -796,17 +840,104 @@
         <div id="cup2" class="cup"><img src="assets/thimble-cup.webp" alt="2-stakan"><span>2</span></div>
         <div id="cup3" class="cup"><img src="assets/thimble-cup.webp" alt="3-stakan"><span>3</span></div>
       </div>
-      <div id="thimblesTip" class="tip">0 chi variantni bosing!</div>
-      <div class="hint">1 dan 3 gacha</div>
+      <div id="thimblesTip" class="tip" data-result-type="option" data-result-value="0">0 chi variantni bosing!</div>
+      <div class="hint" data-i18n="rangeThree">1 dan 3 gacha</div>
     </div>
     <div class="bottom">
-      <button class="btn" onclick="spinThimbles()">SCAN</button>
+      <button class="btn" onclick="spinThimbles()" data-i18n="scan">SCAN</button>
     </div>
   </div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.12.2/lottie.min.js"></script>
 <script>
+  const translations = {
+    uz:{
+      offline:"Offline", online:"Online", settings:"Settings", telegram:"Telegram / Yordam",
+      rules:"Qoidalar", back:"Orqaga", restart:"Restart", scan:"SCAN", play:"O‘ynash",
+      placeBet:"Garov tiking", enterId:"BetWinner ID yozing", save:"Saqlash", close:"Yopish",
+      understood:"Tushundim", rulesTitle:"SUNET HACK — foydalanish shartlari",
+      promoRule:"Ro‘yxatdan o‘tishda promokod:", depositRule:"Minimal depozit:",
+      idSettingsRule:"BetWinner ID’ni ⚙️ Settings orqali kiriting.",
+      onlineRule:"ID muvaffaqiyatli tekshirilgandan keyin tizim Online holatiga o‘tadi.",
+      activationTitle:"SUNET HACK — Faollashtirish",
+      activationText:"ID’ingizni to‘g‘ri kiriting va tizimni faollashtiring.",
+      responsible:"Mas’uliyat bilan foydalaning • 18+", analyzing:"Analiz qilinmoqda...",
+      rowResult:n=>`${n}-qatorni bosing!`, optionResult:n=>`${n}-variantni bosing!`,
+      rangeFive:"1 dan 5 gacha", rangeThree:"1 dan 3 gacha", language:"Tilni tanlash"
+    },
+    ru:{
+      offline:"Офлайн", online:"Онлайн", settings:"Настройки", telegram:"Telegram / Поддержка",
+      rules:"Правила", back:"Назад", restart:"Перезапуск", scan:"СКАН", play:"Играть",
+      placeBet:"Сделайте ставку", enterId:"Введите BetWinner ID", save:"Сохранить", close:"Закрыть",
+      understood:"Понятно", rulesTitle:"SUNET HACK — условия использования",
+      promoRule:"Промокод при регистрации:", depositRule:"Минимальный депозит:",
+      idSettingsRule:"Введите BetWinner ID через ⚙️ Настройки.",
+      onlineRule:"После успешной проверки ID система перейдёт в режим Онлайн.",
+      activationTitle:"SUNET HACK — Активация",
+      activationText:"Введите правильный ID и активируйте систему.",
+      responsible:"Используйте ответственно • 18+", analyzing:"Идёт анализ...",
+      rowResult:n=>`Нажмите на ${n}-й ряд!`, optionResult:n=>`Выберите ${n}-й вариант!`,
+      rangeFive:"От 1 до 5", rangeThree:"От 1 до 3", language:"Выбор языка"
+    },
+    en:{
+      offline:"Offline", online:"Online", settings:"Settings", telegram:"Telegram / Support",
+      rules:"Rules", back:"Back", restart:"Restart", scan:"SCAN", play:"Play",
+      placeBet:"Place your bet", enterId:"Enter BetWinner ID", save:"Save", close:"Close",
+      understood:"Got it", rulesTitle:"SUNET HACK — terms of use",
+      promoRule:"Registration promo code:", depositRule:"Minimum deposit:",
+      idSettingsRule:"Enter your BetWinner ID through ⚙️ Settings.",
+      onlineRule:"After successful ID verification, the system will switch Online.",
+      activationTitle:"SUNET HACK — Activation",
+      activationText:"Enter your ID correctly and activate the system.",
+      responsible:"Use responsibly • 18+", analyzing:"Analyzing...",
+      rowResult:n=>`Tap row ${n}!`, optionResult:n=>`Choose option ${n}!`,
+      rangeFive:"From 1 to 5", rangeThree:"From 1 to 3", language:"Select language"
+    }
+  };
+
+  const supportedLanguages = ["uz","ru","en"];
+  let currentLanguage = localStorage.getItem("sunetLanguage") || "uz";
+  if(!supportedLanguages.includes(currentLanguage)) currentLanguage = "uz";
+
+  function t(key,...args){
+    const value = translations[currentLanguage][key] ?? translations.uz[key] ?? key;
+    return typeof value === "function" ? value(...args) : value;
+  }
+
+  function refreshDynamicText(){
+    document.querySelectorAll(".tip[data-result-type]").forEach(tip=>{
+      if(tip.dataset.state === "analyzing"){
+        tip.textContent = t("analyzing");
+        return;
+      }
+      const value = Number(tip.dataset.resultValue || 0);
+      tip.textContent = tip.dataset.resultType === "option" ? t("optionResult",value) : t("rowResult",value);
+    });
+  }
+
+  function applyLanguage(){
+    document.documentElement.lang = currentLanguage;
+    document.getElementById("languageSelect").value = currentLanguage;
+    document.querySelectorAll("[data-i18n]").forEach(el=>{
+      el.textContent = t(el.dataset.i18n);
+    });
+    document.querySelector(".language-switcher").setAttribute("aria-label",t("language"));
+    document.querySelector(".settings").setAttribute("aria-label",t("settings"));
+    document.querySelector(".settings-icon").alt = t("settings");
+    document.querySelector(".telegram").setAttribute("aria-label",t("telegram"));
+    document.querySelector(".telegram-icon").alt = t("telegram");
+    statusEl.setAttribute("aria-label",active ? t("online") : t("offline"));
+    refreshDynamicText();
+  }
+
+  function setLanguage(language){
+    if(!supportedLanguages.includes(language)) return;
+    currentLanguage = language;
+    localStorage.setItem("sunetLanguage",language);
+    applyLanguage();
+  }
+
   const menuScreen = document.getElementById("menuScreen");
   const appleScreen = document.getElementById("appleScreen");
   const thimblesScreen = document.getElementById("thimblesScreen");
@@ -858,7 +989,7 @@
   }
 
   function setID(){
-    const id = prompt("Betwinner ID yozing");
+    const id = prompt(t("enterId"));
     if(!id) return;
 
     active = /^\d{10}$/.test(id);
@@ -866,6 +997,7 @@
   }
 
   function updateStatus(){
+    statusEl.setAttribute("aria-label",active ? t("online") : t("offline"));
     if(!statusAnimation || lastStatusState === active) return;
     if(active) statusAnimation.playSegments([0,54],true);
     else statusAnimation.goToAndStop(0,true);
@@ -904,7 +1036,8 @@
     let i = 0;
     const el = document.getElementById(numId);
     const tip = document.getElementById(tipId);
-    tip.innerText = "Analiz qilinmoqda...";
+    tip.dataset.state = "analyzing";
+    tip.innerText = t("analyzing");
 
     const inter = setInterval(()=>{
       const val = Math.floor(Math.random()*max)+1;
@@ -913,14 +1046,19 @@
       i++;
       if(i > 10){
         clearInterval(inter);
-        tip.innerText = val + " chi qatorni bosing!";
+        tip.dataset.state = "result";
+        tip.dataset.resultValue = val;
+        tip.innerText = t("rowResult",val);
       }
     },90);
   }
 
   function resetNum(numId, tipId, trackId){
     document.getElementById(numId).innerText = 0;
-    document.getElementById(tipId).innerText = "0 chi qatorni bosing!";
+    const tip = document.getElementById(tipId);
+    tip.dataset.state = "result";
+    tip.dataset.resultValue = 0;
+    tip.innerText = t("rowResult",0);
     if(trackId) document.querySelectorAll("#"+trackId+" .track-cell").forEach(cell=>cell.classList.remove("selected"));
   }
 
@@ -928,7 +1066,8 @@
     let i = 0;
     const tip = document.getElementById("thimblesTip");
     const cups = [document.getElementById("cup1"), document.getElementById("cup2"), document.getElementById("cup3")];
-    tip.innerText = "Analiz qilinmoqda...";
+    tip.dataset.state = "analyzing";
+    tip.innerText = t("analyzing");
 
     const inter = setInterval(()=>{
       const val = Math.floor(Math.random()*3)+1;
@@ -937,15 +1076,22 @@
       i++;
       if(i > 10){
         clearInterval(inter);
-        tip.innerText = val + " chi variantni bosing!";
+        tip.dataset.state = "result";
+        tip.dataset.resultValue = val;
+        tip.innerText = t("optionResult",val);
       }
     },90);
   }
 
   function resetThimbles(){
     [cup1,cup2,cup3].forEach(c=>c.classList.remove("active"));
-    document.getElementById("thimblesTip").innerText = "0 chi variantni bosing!";
+    const tip = document.getElementById("thimblesTip");
+    tip.dataset.state = "result";
+    tip.dataset.resultValue = 0;
+    tip.innerText = t("optionResult",0);
   }
+
+  applyLanguage();
 
   /* stars */
   const c = document.getElementById("stars");
