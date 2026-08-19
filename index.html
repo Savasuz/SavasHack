@@ -586,6 +586,16 @@
     font-size:19px;
     line-height:1.3;
     text-align:center;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:7px;
+  }
+
+  .rules-title-bot{
+    width:30px;
+    height:30px;
+    flex:0 0 30px;
   }
 
   .rules-robot{
@@ -697,7 +707,7 @@
 <div id="rulesModal" class="rules-overlay hidden" onclick="closeRules(event)">
   <div class="rules-modal" role="dialog" aria-modal="true" aria-labelledby="rulesTitle">
     <div id="rulesRobot" class="rules-robot" aria-hidden="true"></div>
-    <h2 id="rulesTitle" class="rules-title">🤖 Bashoratchidan foydalanish qoidalari</h2>
+    <h2 id="rulesTitle" class="rules-title"><span id="rulesTitleBot" class="rules-title-bot" aria-hidden="true"></span><span>Bashoratchidan foydalanish qoidalari</span></h2>
     <ul class="rules-list">
       <li>Ro‘yxatdan o‘tishda promokod: <strong>SUNET</strong></li>
       <li>Minimal depozit: <strong>5$ (~60 000 so‘m)</strong></li>
@@ -815,6 +825,7 @@
   const swampScreen = document.getElementById("swampScreen");
   const rulesModal = document.getElementById("rulesModal");
   const rulesRobot = document.getElementById("rulesRobot");
+  const rulesTitleBot = document.getElementById("rulesTitleBot");
   const warningAnimation = document.getElementById("warningAnimation");
 
   function openRules(){
@@ -838,6 +849,14 @@
       loop:true,
       autoplay:true,
       path:"assets/robot-working.json"
+    });
+
+    lottie.loadAnimation({
+      container:rulesTitleBot,
+      renderer:"svg",
+      loop:true,
+      autoplay:true,
+      path:"assets/bott.json"
     });
 
     lottie.loadAnimation({
