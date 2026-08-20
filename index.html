@@ -703,33 +703,46 @@
     background:linear-gradient(150deg,rgba(8,24,45,.98),rgba(2,8,18,.98));
     box-shadow:0 24px 70px rgba(0,0,0,.68),0 0 32px rgba(51,150,255,.22),inset 0 1px 0 rgba(255,255,255,.06);
     text-align:center;
+    overflow:hidden;
   }
 
   .id-animation-wrap{
     position:relative;
-    width:190px;
-    height:126px;
+    width:200px;
+    height:138px;
     margin:0 auto 2px;
-    overflow:hidden;
+    overflow:hidden !important;
+    contain:layout paint;
   }
 
   .id-logo{
     position:absolute;
-    z-index:1;
-    top:28px;
-    left:50%;
-    width:66px;
-    height:74px;
-    transform:translateX(-50%);
+    z-index:3;
+    top:77%;
+    left:40.5%;
+    width:18px;
+    height:auto;
+    transform:translate(-50%,-50%) rotate(-5deg) skewX(-4deg);
     object-fit:contain;
-    opacity:.62;
-    filter:drop-shadow(0 0 13px rgba(117,255,0,.62));
+    opacity:.96;
+    filter:drop-shadow(0 0 4px rgba(117,255,0,.7));
+    pointer-events:none;
   }
 
   .id-animation{
     position:absolute;
     inset:0;
     z-index:2;
+    width:100% !important;
+    height:100% !important;
+    overflow:hidden !important;
+  }
+
+  .id-animation svg{
+    width:100% !important;
+    height:100% !important;
+    max-width:100% !important;
+    max-height:100% !important;
   }
 
   .id-title{
@@ -849,7 +862,7 @@
 <div id="idModal" class="id-overlay hidden" onclick="closeIDModal(event)">
   <div class="id-modal" role="dialog" aria-modal="true" aria-labelledby="idModalTitle">
     <div class="id-animation-wrap" aria-hidden="true">
-      <img class="id-logo" src="assets/sunet-logo.jpeg" alt="">
+      <img class="id-logo" src="assets/sunet-logo.png" alt="">
       <div id="idAnimation" class="id-animation"></div>
     </div>
     <h2 id="idModalTitle" class="id-title" data-i18n="enterId">BetWinner ID yozing</h2>
