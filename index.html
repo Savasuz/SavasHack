@@ -2,8 +2,9 @@
 <html lang="uz">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SAVAS VIP — Game Analyzer</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#02040b">
+<title>SUNET HACK — Game Analyzer</title>
 
 <style>
   :root{
@@ -15,6 +16,10 @@
     --muted:#b7c7de;
     --green:#42ffb0;
     --red:#ff4b5c;
+    --safe-top:env(safe-area-inset-top,0px);
+    --safe-right:env(safe-area-inset-right,0px);
+    --safe-bottom:env(safe-area-inset-bottom,0px);
+    --safe-left:env(safe-area-inset-left,0px);
   }
 
   *{
@@ -40,8 +45,8 @@
 
   .settings{
     position:fixed;
-    top:16px;
-    left:16px;
+    top:calc(16px + var(--safe-top));
+    left:calc(16px + var(--safe-left));
     font-size:28px;
     cursor:pointer;
     z-index:30;
@@ -67,7 +72,7 @@
 
   #status{
     position:fixed;
-    top:8px;
+    top:calc(8px + var(--safe-top));
     left:50%;
     transform:translateX(-50%);
     z-index:30;
@@ -77,8 +82,8 @@
 
   .language-switcher{
     position:fixed;
-    top:25px;
-    right:72px;
+    top:calc(25px + var(--safe-top));
+    right:calc(72px + var(--safe-right));
     z-index:31;
     height:30px;
     display:flex;
@@ -121,6 +126,7 @@
   .screen{
     width:100%;
     min-height:100vh;
+    min-height:100dvh;
     display:flex;
     justify-content:center;
     align-items:center;
@@ -260,8 +266,8 @@
 
   .telegram{
     position:fixed;
-    top:16px;
-    right:16px;
+    top:calc(16px + var(--safe-top));
+    right:calc(16px + var(--safe-right));
     z-index:30;
     width:48px;
     height:48px;
@@ -288,6 +294,7 @@
   .game-wrap{
     width:100%;
     min-height:100vh;
+    min-height:100dvh;
     display:none;
     justify-content:center;
     align-items:center;
@@ -601,6 +608,9 @@
     background:rgba(0,3,10,.78);
     backdrop-filter:blur(9px);
     -webkit-backdrop-filter:blur(9px);
+    overflow-y:auto;
+    padding-top:max(22px,var(--safe-top));
+    padding-bottom:max(22px,var(--safe-bottom));
   }
 
   .rules-modal{
@@ -692,6 +702,9 @@
     background:rgba(0,3,10,.8);
     backdrop-filter:blur(9px);
     -webkit-backdrop-filter:blur(9px);
+    overflow-y:auto;
+    padding-top:max(22px,var(--safe-top));
+    padding-bottom:max(22px,var(--safe-bottom));
   }
 
   .id-modal{
@@ -801,11 +814,11 @@
     .panel{border-radius:24px;padding:20px 15px}
     .game{min-height:590px;border-radius:26px}
     .num{font-size:112px}
-    .settings{top:12px;left:12px;width:44px;height:44px;font-size:24px}
+    .settings{top:calc(12px + var(--safe-top));left:calc(12px + var(--safe-left));width:44px;height:44px;font-size:24px}
     .settings-icon{width:42px;height:42px}
-    .telegram{top:12px;right:12px;width:44px;height:44px}
+    .telegram{top:calc(12px + var(--safe-top));right:calc(12px + var(--safe-right));width:44px;height:44px}
     .telegram-icon{width:42px;height:42px}
-    .language-switcher{top:20px;right:66px;height:28px}
+    .language-switcher{top:calc(20px + var(--safe-top));right:calc(66px + var(--safe-right));height:28px}
   }
 </style>
 </head>
@@ -1071,13 +1084,58 @@
   const idAnimation = document.getElementById("idAnimation");
   const betwinnerIdInput = document.getElementById("betwinnerIdInput");
 
+  let rulesRobotAnimation = null;
+  let warningLottieAnimation = null;
+  let idLottieAnimation = null;
+
+  function ensureRulesAnimations(){
+    if(!window.lottie) return;
+    if(!rulesRobotAnimation){
+      rulesRobotAnimation = lottie.loadAnimation({
+        container:rulesRobot,
+        renderer:"svg",
+        loop:true,
+        autoplay:false,
+        path:"assets/robot-working.json"
+      });
+    }
+    if(!warningLottieAnimation){
+      warningLottieAnimation = lottie.loadAnimation({
+        container:warningAnimation,
+        renderer:"svg",
+        loop:true,
+        autoplay:false,
+        path:"assets/success.json"
+      });
+    }
+    rulesRobotAnimation.play();
+    warningLottieAnimation.play();
+  }
+
+  function ensureIdAnimation(){
+    if(!window.lottie) return;
+    if(!idLottieAnimation){
+      idLottieAnimation = lottie.loadAnimation({
+        container:idAnimation,
+        renderer:"svg",
+        loop:true,
+        autoplay:false,
+        path:"assets/work.json?v=3c30eb"
+      });
+    }
+    idLottieAnimation.play();
+  }
+
   function openRules(){
     rulesModal.classList.remove("hidden");
+    ensureRulesAnimations();
   }
 
   function closeRules(event){
     if(event && event.target !== rulesModal) return;
     rulesModal.classList.add("hidden");
+    if(rulesRobotAnimation) rulesRobotAnimation.pause();
+    if(warningLottieAnimation) warningLottieAnimation.pause();
   }
 
   const statusEl = document.getElementById("status");
@@ -1086,30 +1144,6 @@
   let lastStatusState = null;
 
   if(window.lottie){
-    lottie.loadAnimation({
-      container:rulesRobot,
-      renderer:"svg",
-      loop:true,
-      autoplay:true,
-      path:"assets/robot-working.json"
-    });
-
-    lottie.loadAnimation({
-      container:warningAnimation,
-      renderer:"svg",
-      loop:true,
-      autoplay:true,
-      path:"assets/success.json"
-    });
-
-    lottie.loadAnimation({
-      container:idAnimation,
-      renderer:"svg",
-      loop:true,
-      autoplay:true,
-      path:"assets/work.json?v=3c30eb"
-    });
-
     statusAnimation = lottie.loadAnimation({
       container: statusEl,
       renderer: "svg",
@@ -1123,12 +1157,14 @@
   function setID(){
     betwinnerIdInput.value = "";
     idModal.classList.remove("hidden");
+    ensureIdAnimation();
     setTimeout(()=>betwinnerIdInput.focus(),80);
   }
 
   function closeIDModal(event){
     if(event && event.target !== idModal) return;
     idModal.classList.add("hidden");
+    if(idLottieAnimation) idLottieAnimation.pause();
   }
 
   function saveID(){
@@ -1143,6 +1179,10 @@
   betwinnerIdInput.addEventListener("keydown",event=>{
     if(event.key === "Enter") saveID();
     if(event.key === "Escape") closeIDModal();
+  });
+
+  betwinnerIdInput.addEventListener("input",()=>{
+    betwinnerIdInput.value = betwinnerIdInput.value.replace(/\D/g,"").slice(0,10);
   });
 
   function updateStatus(){
@@ -1233,7 +1273,7 @@
   }
 
   function resetThimbles(){
-    [cup1,cup2,cup3].forEach(c=>c.classList.remove("active"));
+    ["cup1","cup2","cup3"].forEach(id=>document.getElementById(id).classList.remove("active"));
     const tip = document.getElementById("thimblesTip");
     tip.dataset.state = "result";
     tip.dataset.resultValue = 0;
@@ -1253,10 +1293,16 @@
   resize();
   window.addEventListener("resize", resize);
 
-  const stars = Array(120).fill(0).map(()=>({
+  const prefersReducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const lowMemoryDevice = typeof navigator.deviceMemory === "number" && navigator.deviceMemory <= 2;
+  const lowCoreDevice = typeof navigator.hardwareConcurrency === "number" && navigator.hardwareConcurrency <= 4;
+  const starCount = prefersReducedMotion ? 24 : (lowMemoryDevice || lowCoreDevice ? 48 : 90);
+  const stars = Array(starCount).fill(0).map(()=>({
     x: Math.random()*c.width,
     y: Math.random()*c.height
   }));
+
+  let starsFrame = null;
 
   function draw(){
     const bg = ctx.createRadialGradient(c.width*.72,0,0,c.width*.72,0,Math.max(c.width,c.height));
@@ -1269,16 +1315,31 @@
     ctx.fillStyle = "white";
     stars.forEach(s=>{
       ctx.fillRect(s.x,s.y,2,2);
-      s.y += 0.45;
+      s.y += prefersReducedMotion ? 0 : 0.45;
       if(s.y > c.height){
         s.y = 0;
         s.x = Math.random()*c.width;
       }
     });
 
-    requestAnimationFrame(draw);
+    starsFrame = requestAnimationFrame(draw);
   }
   draw();
+
+  document.addEventListener("visibilitychange",()=>{
+    if(document.hidden){
+      if(starsFrame) cancelAnimationFrame(starsFrame);
+      starsFrame = null;
+      if(rulesRobotAnimation) rulesRobotAnimation.pause();
+      if(warningLottieAnimation) warningLottieAnimation.pause();
+      if(idLottieAnimation) idLottieAnimation.pause();
+      return;
+    }
+
+    if(!starsFrame) draw();
+    if(!rulesModal.classList.contains("hidden")) ensureRulesAnimations();
+    if(!idModal.classList.contains("hidden")) ensureIdAnimation();
+  });
 </script>
 
 </body>
