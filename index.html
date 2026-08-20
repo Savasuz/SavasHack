@@ -681,6 +681,92 @@
     box-shadow:0 10px 26px rgba(45,108,255,.3);
   }
 
+  .id-overlay{
+    position:fixed;
+    inset:0;
+    z-index:110;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:22px;
+    background:rgba(0,3,10,.8);
+    backdrop-filter:blur(9px);
+    -webkit-backdrop-filter:blur(9px);
+  }
+
+  .id-modal{
+    width:100%;
+    max-width:340px;
+    padding:18px 18px 17px;
+    border-radius:24px;
+    border:1px solid rgba(75,155,255,.48);
+    background:linear-gradient(150deg,rgba(8,24,45,.98),rgba(2,8,18,.98));
+    box-shadow:0 24px 70px rgba(0,0,0,.68),0 0 32px rgba(51,150,255,.22),inset 0 1px 0 rgba(255,255,255,.06);
+    text-align:center;
+  }
+
+  .id-animation-wrap{
+    position:relative;
+    width:190px;
+    height:126px;
+    margin:0 auto 2px;
+    overflow:hidden;
+  }
+
+  .id-logo{
+    position:absolute;
+    z-index:1;
+    top:28px;
+    left:50%;
+    width:66px;
+    height:74px;
+    transform:translateX(-50%);
+    object-fit:contain;
+    opacity:.62;
+    filter:drop-shadow(0 0 13px rgba(117,255,0,.62));
+  }
+
+  .id-animation{
+    position:absolute;
+    inset:0;
+    z-index:2;
+  }
+
+  .id-title{
+    margin:0 0 8px;
+    color:#ffffff;
+    font-size:18px;
+    font-weight:800;
+  }
+
+  .id-input{margin:0}
+
+  .id-actions{
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    margin-top:14px;
+  }
+
+  .id-action{
+    min-width:104px;
+    padding:11px 15px;
+    border-radius:14px;
+    border:1px solid rgba(85,176,255,.3);
+    background:rgba(7,20,38,.82);
+    color:#dfe9f7;
+    font-size:14px;
+    font-weight:800;
+    cursor:pointer;
+  }
+
+  .id-action.primary{
+    border:0;
+    color:#ffffff;
+    background:linear-gradient(90deg,var(--blue1),var(--blue2));
+    box-shadow:0 10px 24px rgba(45,108,255,.3);
+  }
+
   .active{
     outline:4px solid var(--green);
     transform:translateY(-6px) scale(1.04);
@@ -757,6 +843,21 @@
       </div>
     </div>
     <button class="rules-close" type="button" onclick="closeRules()" data-i18n="understood">Tushundim</button>
+  </div>
+</div>
+
+<div id="idModal" class="id-overlay hidden" onclick="closeIDModal(event)">
+  <div class="id-modal" role="dialog" aria-modal="true" aria-labelledby="idModalTitle">
+    <div class="id-animation-wrap" aria-hidden="true">
+      <img class="id-logo" src="assets/sunet-logo.jpeg" alt="">
+      <div id="idAnimation" class="id-animation"></div>
+    </div>
+    <h2 id="idModalTitle" class="id-title" data-i18n="enterId">BetWinner ID yozing</h2>
+    <input id="betwinnerIdInput" class="id-input" type="tel" inputmode="numeric" maxlength="10" autocomplete="off" placeholder="BetWinner ID yozing">
+    <div class="id-actions">
+      <button class="id-action" type="button" onclick="closeIDModal()" data-i18n="close">Yopish</button>
+      <button class="id-action primary" type="button" onclick="saveID()" data-i18n="save">Saqlash</button>
+    </div>
   </div>
 </div>
 
@@ -927,6 +1028,7 @@
     document.querySelector(".settings-icon").alt = t("settings");
     document.querySelector(".telegram").setAttribute("aria-label",t("telegram"));
     document.querySelector(".telegram-icon").alt = t("telegram");
+    betwinnerIdInput.placeholder = t("enterId");
     statusEl.setAttribute("aria-label",active ? t("online") : t("offline"));
     refreshDynamicText();
   }
@@ -946,6 +1048,9 @@
   const rulesModal = document.getElementById("rulesModal");
   const rulesRobot = document.getElementById("rulesRobot");
   const warningAnimation = document.getElementById("warningAnimation");
+  const idModal = document.getElementById("idModal");
+  const idAnimation = document.getElementById("idAnimation");
+  const betwinnerIdInput = document.getElementById("betwinnerIdInput");
 
   function openRules(){
     rulesModal.classList.remove("hidden");
@@ -978,6 +1083,14 @@
       path:"assets/success.json"
     });
 
+    lottie.loadAnimation({
+      container:idAnimation,
+      renderer:"svg",
+      loop:true,
+      autoplay:true,
+      path:"assets/work.json"
+    });
+
     statusAnimation = lottie.loadAnimation({
       container: statusEl,
       renderer: "svg",
@@ -989,12 +1102,29 @@
   }
 
   function setID(){
-    const id = prompt(t("enterId"));
+    betwinnerIdInput.value = "";
+    idModal.classList.remove("hidden");
+    setTimeout(()=>betwinnerIdInput.focus(),80);
+  }
+
+  function closeIDModal(event){
+    if(event && event.target !== idModal) return;
+    idModal.classList.add("hidden");
+  }
+
+  function saveID(){
+    const id = betwinnerIdInput.value.trim();
     if(!id) return;
 
     active = /^\d{10}$/.test(id);
     updateStatus();
+    closeIDModal();
   }
+
+  betwinnerIdInput.addEventListener("keydown",event=>{
+    if(event.key === "Enter") saveID();
+    if(event.key === "Escape") closeIDModal();
+  });
 
   function updateStatus(){
     statusEl.setAttribute("aria-label",active ? t("online") : t("offline"));
