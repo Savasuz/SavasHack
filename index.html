@@ -597,6 +597,58 @@
     box-shadow:0 0 22px rgba(51,214,255,.2);
   }
 
+  .panel-actions{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+
+  .android-btn{
+    width:44px;
+    height:40px;
+    margin-top:14px;
+    padding:3px;
+    border-radius:14px;
+    border:1px solid rgba(85,176,255,.34);
+    background:rgba(7,20,38,.82);
+    cursor:pointer;
+    box-shadow:0 0 18px rgba(51,214,255,.1),inset 0 1px 0 rgba(255,255,255,.06);
+  }
+
+  .android-animation{width:100%;height:100%;pointer-events:none}
+
+  .download-overlay{
+    position:fixed;
+    inset:0;
+    z-index:130;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:22px;
+    background:rgba(0,3,10,.82);
+    backdrop-filter:blur(9px);
+    -webkit-backdrop-filter:blur(9px);
+  }
+
+  .download-modal{
+    width:100%;
+    max-width:340px;
+    padding:22px 20px 18px;
+    border-radius:24px;
+    border:1px solid rgba(75,155,255,.48);
+    background:linear-gradient(150deg,rgba(8,24,45,.99),rgba(2,8,18,.99));
+    text-align:center;
+    box-shadow:0 24px 70px rgba(0,0,0,.68),0 0 32px rgba(51,150,255,.22);
+  }
+
+  .download-modal-icon{width:74px;height:74px;margin:0 auto 7px}
+  .download-title{margin:0;color:#fff;font-size:18px;line-height:1.45}
+  .download-actions{display:flex;justify-content:center;gap:10px;margin-top:18px}
+  .download-action{min-width:118px;padding:11px 14px;border-radius:14px;border:1px solid rgba(85,176,255,.32);background:rgba(7,20,38,.86);color:#eaf3ff;font-weight:800;cursor:pointer}
+  .download-action.primary{border:0;background:linear-gradient(90deg,var(--blue1),var(--blue2));color:#fff}
+
   .rules-overlay{
     position:fixed;
     inset:0;
@@ -852,7 +904,23 @@
       <div class="card" onclick="openGame('kamikaze')"><img src="assets/kamikaze.webp" alt="Kamikaze"><div class="card-label">Kamikaze</div></div>
       <div class="card" onclick="openGame('swamp')"><img src="assets/swamp.webp" alt="Swamp Land"><div class="card-label">Swamp Land</div></div>
     </div>
-    <button class="rules-btn" type="button" onclick="openRules()">📋 <span data-i18n="rules">Qoidalar</span></button>
+    <div class="panel-actions">
+      <button class="rules-btn" type="button" onclick="openRules()">📋 <span data-i18n="rules">Qoidalar</span></button>
+      <button class="android-btn" type="button" onclick="openDownload()" aria-label="Android APK">
+        <div id="androidAnimation" class="android-animation" aria-hidden="true"></div>
+      </button>
+    </div>
+  </div>
+</div>
+
+<div id="downloadModal" class="download-overlay hidden" onclick="closeDownload(event)">
+  <div class="download-modal" role="dialog" aria-modal="true" aria-labelledby="downloadTitle">
+    <div id="downloadModalAnimation" class="download-modal-icon" aria-hidden="true"></div>
+    <h2 id="downloadTitle" class="download-title" data-i18n="downloadQuestion">BetWinner APK faylini yuklab olishni davom ettirasizmi?</h2>
+    <div class="download-actions">
+      <button class="download-action" type="button" onclick="closeDownload()" data-i18n="cancel">Bekor qilish</button>
+      <button class="download-action primary" type="button" onclick="continueDownload()" data-i18n="continue">Davom etish</button>
+    </div>
   </div>
 </div>
 
@@ -997,7 +1065,8 @@
       activationText:"ID’ingizni to‘g‘ri kiriting va tizimni faollashtiring.",
       responsible:"Mas’uliyat bilan foydalaning • 18+", analyzing:"Analiz qilinmoqda...",
       rowResult:n=>`${n}-qatorni bosing!`, optionResult:n=>`${n}-variantni bosing!`,
-      rangeFive:"1 dan 5 gacha", rangeThree:"1 dan 3 gacha", language:"Tilni tanlash"
+      rangeFive:"1 dan 5 gacha", rangeThree:"1 dan 3 gacha", language:"Tilni tanlash",
+      downloadQuestion:"BetWinner APK faylini yuklab olishni davom ettirasizmi?", cancel:"Bekor qilish", continue:"Davom etish"
     },
     ru:{
       offline:"Офлайн", online:"Онлайн", settings:"Настройки", telegram:"Telegram / Поддержка",
@@ -1011,7 +1080,8 @@
       activationText:"Введите правильный ID и активируйте систему.",
       responsible:"Используйте ответственно • 18+", analyzing:"Идёт анализ...",
       rowResult:n=>`Нажмите на ${n}-й ряд!`, optionResult:n=>`Выберите ${n}-й вариант!`,
-      rangeFive:"От 1 до 5", rangeThree:"От 1 до 3", language:"Выбор языка"
+      rangeFive:"От 1 до 5", rangeThree:"От 1 до 3", language:"Выбор языка",
+      downloadQuestion:"Продолжить получение BetWinner APK?", cancel:"Отмена", continue:"Продолжить"
     },
     en:{
       offline:"Offline", online:"Online", settings:"Settings", telegram:"Telegram / Support",
@@ -1025,7 +1095,8 @@
       activationText:"Enter your ID correctly and activate the system.",
       responsible:"Use responsibly • 18+", analyzing:"Analyzing...",
       rowResult:n=>`Tap row ${n}!`, optionResult:n=>`Choose option ${n}!`,
-      rangeFive:"From 1 to 5", rangeThree:"From 1 to 3", language:"Select language"
+      rangeFive:"From 1 to 5", rangeThree:"From 1 to 3", language:"Select language",
+      downloadQuestion:"Continue to get the BetWinner APK?", cancel:"Cancel", continue:"Continue"
     }
   };
 
@@ -1080,13 +1151,59 @@
   const rulesModal = document.getElementById("rulesModal");
   const rulesRobot = document.getElementById("rulesRobot");
   const warningAnimation = document.getElementById("warningAnimation");
+  const downloadModal = document.getElementById("downloadModal");
+  const androidAnimation = document.getElementById("androidAnimation");
+  const downloadModalAnimation = document.getElementById("downloadModalAnimation");
   const idModal = document.getElementById("idModal");
   const idAnimation = document.getElementById("idAnimation");
   const betwinnerIdInput = document.getElementById("betwinnerIdInput");
 
   let rulesRobotAnimation = null;
   let warningLottieAnimation = null;
+  let androidButtonLottie = null;
+  let androidModalLottie = null;
   let idLottieAnimation = null;
+
+  function ensureAndroidButtonAnimation(){
+    if(!window.lottie || androidButtonLottie) return;
+    androidButtonLottie = lottie.loadAnimation({
+      container:androidAnimation,
+      renderer:"svg",
+      loop:true,
+      autoplay:true,
+      path:"assets/android-part.json"
+    });
+  }
+
+  function ensureAndroidModalAnimation(){
+    if(!window.lottie) return;
+    if(!androidModalLottie){
+      androidModalLottie = lottie.loadAnimation({
+        container:downloadModalAnimation,
+        renderer:"svg",
+        loop:true,
+        autoplay:false,
+        path:"assets/android-part.json"
+      });
+    }
+    androidModalLottie.play();
+  }
+
+  function openDownload(){
+    downloadModal.classList.remove("hidden");
+    ensureAndroidModalAnimation();
+  }
+
+  function closeDownload(event){
+    if(event && event.target !== downloadModal) return;
+    downloadModal.classList.add("hidden");
+    if(androidModalLottie) androidModalLottie.pause();
+  }
+
+  function continueDownload(){
+    closeDownload();
+    window.open("https://t.me/+B7nEGQy2FGxhODgy","_blank","noopener");
+  }
 
   function ensureRulesAnimations(){
     if(!window.lottie) return;
@@ -1281,6 +1398,7 @@
   }
 
   applyLanguage();
+  ensureAndroidButtonAnimation();
 
   /* stars */
   const c = document.getElementById("stars");
@@ -1332,12 +1450,17 @@
       starsFrame = null;
       if(rulesRobotAnimation) rulesRobotAnimation.pause();
       if(warningLottieAnimation) warningLottieAnimation.pause();
+      if(androidButtonLottie) androidButtonLottie.pause();
+      if(androidModalLottie) androidModalLottie.pause();
       if(idLottieAnimation) idLottieAnimation.pause();
       return;
     }
 
     if(!starsFrame) draw();
     if(!rulesModal.classList.contains("hidden")) ensureRulesAnimations();
+    ensureAndroidButtonAnimation();
+    if(androidButtonLottie) androidButtonLottie.play();
+    if(!downloadModal.classList.contains("hidden")) ensureAndroidModalAnimation();
     if(!idModal.classList.contains("hidden")) ensureIdAnimation();
   });
 </script>
