@@ -718,15 +718,21 @@
   .id-logo{
     position:absolute;
     z-index:3;
-    top:79%;
-    left:25%;
-    width:12px;
+    top:66%;
+    left:55%;
+    width:22px;
     height:auto;
-    transform:translate(-50%,-50%) rotate(-4deg) skewX(-3deg);
+    transform:translate(-50%,-50%);
     object-fit:contain;
     opacity:.96;
-    filter:drop-shadow(0 0 1px rgba(117,255,0,.45));
+    filter:drop-shadow(0 0 3px rgba(117,255,0,.55));
     pointer-events:none;
+    animation:moneyFloat 2.4s ease-in-out infinite;
+  }
+
+  @keyframes moneyFloat{
+    0%,100%{transform:translate(-50%,-50%)}
+    50%{transform:translate(-50%,calc(-50% - 4px))}
   }
 
   .id-animation{
