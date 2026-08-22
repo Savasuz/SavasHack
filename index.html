@@ -623,6 +623,27 @@
 
   .android-animation{width:100%;height:100%;pointer-events:none}
 
+  .activity-pill{
+    min-width:108px;
+    height:40px;
+    margin-top:14px;
+    padding:4px 10px 4px 6px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:5px;
+    border-radius:14px;
+    border:1px solid rgba(66,255,176,.28);
+    background:rgba(5,24,28,.82);
+    box-shadow:0 0 18px rgba(66,255,176,.08),inset 0 1px 0 rgba(255,255,255,.05);
+    color:#eafff8;
+  }
+
+  .activity-animation{width:26px;height:26px;flex:0 0 26px;pointer-events:none}
+  .activity-copy{display:flex;flex-direction:column;align-items:flex-start;line-height:1.05;white-space:nowrap}
+  .activity-label{font-size:9px;letter-spacing:.04em;color:#8ab5ae;font-weight:700}
+  .activity-value{font-size:13px;color:#58f5b0;font-weight:900}
+
   .download-overlay{
     position:fixed;
     inset:0;
@@ -913,6 +934,13 @@
       <button class="android-btn" type="button" onclick="openDownload()" aria-label="Android APK">
         <div id="androidAnimation" class="android-animation" aria-hidden="true"></div>
       </button>
+      <div class="activity-pill" role="status" aria-live="polite">
+        <div id="activityAnimation" class="activity-animation" aria-hidden="true"></div>
+        <div class="activity-copy">
+          <span class="activity-label" data-i18n="estimatedActivity">Taxminiy faollik</span>
+          <span class="activity-value">~<span id="activityCount">0</span> <span data-i18n="activeNow">faol</span></span>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -1070,7 +1098,8 @@
       responsible:"Mas’uliyat bilan foydalaning • 18+", analyzing:"Analiz qilinmoqda...",
       rowResult:n=>`${n}-qatorni bosing!`, optionResult:n=>`${n}-variantni bosing!`,
       rangeFive:"1 dan 5 gacha", rangeThree:"1 dan 3 gacha", language:"Tilni tanlash",
-      downloadQuestion:"BetWinner APK faylini yuklab olishni davom ettirasizmi?", cancel:"Bekor qilish", continue:"Davom etish"
+      downloadQuestion:"BetWinner APK faylini yuklab olishni davom ettirasizmi?", cancel:"Bekor qilish", continue:"Davom etish",
+      estimatedActivity:"Taxminiy faollik", activeNow:"faol"
     },
     ru:{
       offline:"Офлайн", online:"Онлайн", settings:"Настройки", telegram:"Telegram / Поддержка",
@@ -1085,7 +1114,8 @@
       responsible:"Используйте ответственно • 18+", analyzing:"Идёт анализ...",
       rowResult:n=>`Нажмите на ${n}-й ряд!`, optionResult:n=>`Выберите ${n}-й вариант!`,
       rangeFive:"От 1 до 5", rangeThree:"От 1 до 3", language:"Выбор языка",
-      downloadQuestion:"Продолжить получение BetWinner APK?", cancel:"Отмена", continue:"Продолжить"
+      downloadQuestion:"Продолжить получение BetWinner APK?", cancel:"Отмена", continue:"Продолжить",
+      estimatedActivity:"Примерная активность", activeNow:"активны"
     },
     en:{
       offline:"Offline", online:"Online", settings:"Settings", telegram:"Telegram / Support",
@@ -1100,7 +1130,8 @@
       responsible:"Use responsibly • 18+", analyzing:"Analyzing...",
       rowResult:n=>`Tap row ${n}!`, optionResult:n=>`Choose option ${n}!`,
       rangeFive:"From 1 to 5", rangeThree:"From 1 to 3", language:"Select language",
-      downloadQuestion:"Continue to get the BetWinner APK?", cancel:"Cancel", continue:"Continue"
+      downloadQuestion:"Continue to get the BetWinner APK?", cancel:"Cancel", continue:"Continue",
+      estimatedActivity:"Estimated activity", activeNow:"active"
     }
   };
 
@@ -1158,6 +1189,8 @@
   const downloadModal = document.getElementById("downloadModal");
   const androidAnimation = document.getElementById("androidAnimation");
   const downloadModalAnimation = document.getElementById("downloadModalAnimation");
+  const activityAnimation = document.getElementById("activityAnimation");
+  const activityCount = document.getElementById("activityCount");
   const idModal = document.getElementById("idModal");
   const idAnimation = document.getElementById("idAnimation");
   const betwinnerIdInput = document.getElementById("betwinnerIdInput");
@@ -1166,6 +1199,8 @@
   let warningLottieAnimation = null;
   let androidButtonLottie = null;
   let androidModalLottie = null;
+  let activityLottie = null;
+  let activityTimer = null;
   let idLottieAnimation = null;
 
   function ensureAndroidButtonAnimation(){
@@ -1177,6 +1212,49 @@
       autoplay:true,
       path:"assets/android-part.json"
     });
+  }
+
+  function ensureActivityAnimation(){
+    if(!window.lottie || activityLottie) return;
+    activityLottie = lottie.loadAnimation({
+      container:activityAnimation,
+      renderer:"svg",
+      loop:true,
+      autoplay:true,
+      path:"assets/green-pulse-dot.json"
+    });
+  }
+
+  function activityRange(){
+    const hour = new Date().getHours();
+    if(hour < 6) return [90,165];
+    if(hour < 12) return [35,85];
+    if(hour < 18) return [55,115];
+    if(hour < 22) return [120,205];
+    return [145,235];
+  }
+
+  function nextActivityCount(){
+    const [min,max] = activityRange();
+    let saved = null;
+    try{ saved = JSON.parse(localStorage.getItem("sunetEstimatedActivity")); }catch(_){ saved = null; }
+    const now = Date.now();
+    let value;
+    if(saved && Number.isFinite(saved.value) && now-saved.time < 15*60*1000){
+      value = Math.max(min,Math.min(max,saved.value + Math.floor(Math.random()*17)-8));
+    }else{
+      value = Math.floor(Math.random()*(max-min+1))+min;
+    }
+    localStorage.setItem("sunetEstimatedActivity",JSON.stringify({value,time:now}));
+    activityCount.textContent = value;
+  }
+
+  function scheduleActivityUpdate(){
+    if(activityTimer) clearTimeout(activityTimer);
+    activityTimer = setTimeout(()=>{
+      nextActivityCount();
+      scheduleActivityUpdate();
+    },(5+Math.random()*5)*60*1000);
   }
 
   function ensureAndroidModalAnimation(){
@@ -1403,6 +1481,9 @@
 
   applyLanguage();
   ensureAndroidButtonAnimation();
+  ensureActivityAnimation();
+  nextActivityCount();
+  scheduleActivityUpdate();
 
   /* stars */
   const c = document.getElementById("stars");
@@ -1456,6 +1537,7 @@
       if(warningLottieAnimation) warningLottieAnimation.pause();
       if(androidButtonLottie) androidButtonLottie.pause();
       if(androidModalLottie) androidModalLottie.pause();
+      if(activityLottie) activityLottie.pause();
       if(idLottieAnimation) idLottieAnimation.pause();
       return;
     }
@@ -1464,6 +1546,8 @@
     if(!rulesModal.classList.contains("hidden")) ensureRulesAnimations();
     ensureAndroidButtonAnimation();
     if(androidButtonLottie) androidButtonLottie.play();
+    ensureActivityAnimation();
+    if(activityLottie) activityLottie.play();
     if(!downloadModal.classList.contains("hidden")) ensureAndroidModalAnimation();
     if(!idModal.classList.contains("hidden")) ensureIdAnimation();
   });
