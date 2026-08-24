@@ -731,10 +731,10 @@
   .aviator-loading-blocks svg{width:100%!important;height:100%!important}
   .aviator-signal{position:absolute;inset:0;z-index:2;display:flex;align-items:center;justify-content:center;margin:0;padding-top:4px;font-size:42px;font-weight:950;letter-spacing:-1px;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.95),0 0 24px rgba(255,70,105,.72);animation:aviatorGlow 2.2s ease-in-out infinite;pointer-events:none}
   .aviator-instruction{margin:0;color:#f2f6ff;font-size:16px;font-weight:800}
-  .aviator-countdown-wrap{margin:14px auto 12px;padding:7px 12px 9px;min-height:86px;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:15px;background:rgba(5,17,34,.72);border:1px solid rgba(71,147,255,.22);color:#a9bdd8;font-size:11px}
-  .aviator-countdown-stage{position:relative;width:120px;height:58px;margin-top:1px;overflow:hidden}
-  .aviator-waiting-animation{position:absolute;inset:0;width:100%;height:100%;filter:drop-shadow(0 0 9px rgba(105,223,255,.25));pointer-events:none}
-  .aviator-countdown{position:absolute;left:76%;top:50%;z-index:2;transform:translate(-50%,-50%);color:#fff;font-size:11px;font-weight:950;font-variant-numeric:tabular-nums;text-shadow:0 1px 4px rgba(0,0,0,.95),0 0 9px rgba(105,223,255,.8)}
+  .aviator-countdown-wrap{margin:14px auto 12px;padding:7px 12px;min-height:61px;display:flex;align-items:center;justify-content:center;gap:10px;border-radius:15px;background:rgba(5,17,34,.72);border:1px solid rgba(71,147,255,.22);color:#a9bdd8;font-size:11px}
+  .aviator-waiting-animation{width:48px;height:48px;flex:0 0 48px;overflow:hidden;filter:drop-shadow(0 0 8px rgba(105,223,255,.24))}
+  .aviator-countdown-copy{min-width:108px;text-align:center}
+  .aviator-countdown{display:block;margin-top:2px;color:#69dfff;font-size:23px;font-weight:900;font-variant-numeric:tabular-nums}
   .aviator-history-title{margin:0 0 8px;color:#a9bdd8;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.07em}
   .aviator-history{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
   .aviator-history-item{padding:8px 2px 6px;border-radius:12px;background:rgba(5,17,34,.76);border:1px solid rgba(75,155,255,.18)}
@@ -1066,9 +1066,9 @@
     </div>
     <p id="aviatorInstruction" class="aviator-instruction">00:21 da 1.30x da yutuqni oling</p>
     <div class="aviator-countdown-wrap">
-      <span id="aviatorCountdownLabel">1 daqiqa pauza</span>
-      <div class="aviator-countdown-stage">
-        <div id="aviatorWaitingAnimation" class="aviator-waiting-animation" aria-hidden="true"></div>
+      <div id="aviatorWaitingAnimation" class="aviator-waiting-animation" aria-hidden="true"></div>
+      <div class="aviator-countdown-copy">
+        <span id="aviatorCountdownLabel">1 daqiqa pauza</span>
         <strong id="aviatorCountdown" class="aviator-countdown">01:00</strong>
       </div>
     </div>
@@ -1528,7 +1528,7 @@
         renderer:"svg",
         loop:true,
         autoplay:false,
-        path:"assets/countdown-timer.json?v=2"
+        path:"assets/waiting.json?v=2"
       });
     }
     if(!aviatorLoadingBlocksLottie){
