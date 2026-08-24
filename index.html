@@ -165,25 +165,25 @@
   }
 
   .aviator-open-btn{
-    width:62px;
-    height:52px;
-    padding:2px;
+    width:112px;
+    height:58px;
+    padding:0;
     display:inline-flex;
     align-items:center;
     justify-content:center;
-    border-radius:16px;
-    border:1px solid rgba(255,91,116,.46);
-    background:rgba(34,8,20,.74);
+    border-radius:0;
+    border:0;
+    background:transparent;
     color:#fff;
     font-size:12px;
     font-weight:900;
     cursor:pointer;
-    box-shadow:0 0 18px rgba(255,62,96,.12),inset 0 1px 0 rgba(255,255,255,.06);
-    overflow:hidden;
+    box-shadow:none;
+    overflow:visible;
   }
 
-  .aviator-button-animation{width:48px;height:48px;flex:0 0 48px;pointer-events:none;overflow:hidden}
-  .aviator-button-animation svg{transform:scale(2.35);transform-origin:50% 50%}
+  .aviator-button-animation{width:112px;height:58px;pointer-events:none;overflow:visible;filter:drop-shadow(0 0 7px rgba(255,28,73,.45))}
+  .aviator-button-animation svg{transform:scale(2.65);transform-origin:50% 50%}
 
   .sub{
     margin:0 0 14px;
@@ -992,8 +992,8 @@
     .telegram-icon{width:42px;height:42px}
     .language-switcher{top:calc(20px + var(--safe-top));right:calc(66px + var(--safe-right));height:28px}
     .panel-heading{gap:7px}
-    .aviator-open-btn{width:60px;height:50px;padding:2px}
-    .aviator-button-animation{width:46px;height:46px;flex-basis:46px}
+    .aviator-open-btn{width:98px;height:54px;padding:0}
+    .aviator-button-animation{width:98px;height:54px}
   }
 </style>
 </head>
@@ -1342,8 +1342,8 @@
   let activityLottie = null;
   let activityTimer = null;
   let aviatorLottie = null;
-  let aviatorBackgroundLottie = null;
   let aviatorButtonLottie = null;
+  let aviatorBackgroundLottie = null;
   let idLottieAnimation = null;
 
   function ensureAndroidButtonAnimation(){
@@ -1513,6 +1513,13 @@
     aviatorLottie.play();
   }
 
+  function openAviator(){
+    aviatorModal.classList.remove("hidden");
+    renderAviator();
+    tickAviator();
+    ensureAviatorAnimation();
+  }
+
   function ensureAviatorButtonAnimation(){
     if(!window.lottie || aviatorButtonLottie) return;
     aviatorButtonLottie = lottie.loadAnimation({
@@ -1520,15 +1527,8 @@
       renderer:"svg",
       loop:true,
       autoplay:true,
-      path:"assets/aviator/animation.json"
+      path:"assets/aviator/animation.json?v=2"
     });
-  }
-
-  function openAviator(){
-    aviatorModal.classList.remove("hidden");
-    renderAviator();
-    tickAviator();
-    ensureAviatorAnimation();
   }
 
   function closeAviator(event){
