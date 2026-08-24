@@ -737,6 +737,8 @@
   .aviator-loading-blocks{position:absolute;inset:0;z-index:3;display:none;align-items:center;justify-content:center;width:100%;height:100%;filter:drop-shadow(0 0 12px rgba(105,223,255,.2))}
   .aviator-loading-blocks.active{display:flex}
   .aviator-loading-blocks svg{width:100%!important;height:100%!important}
+  .aviator-splash-animation{position:absolute;inset:0;z-index:4;display:none;width:100%;height:100%;pointer-events:none}
+  .aviator-splash-animation.active{display:block}
   .aviator-signal{position:absolute;inset:0;z-index:2;display:flex;align-items:center;justify-content:center;margin:0;padding-top:4px;font-size:42px;font-weight:950;letter-spacing:-1px;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.95),0 0 24px rgba(255,70,105,.72);animation:aviatorGlow 2.2s ease-in-out infinite;pointer-events:none}
   .aviator-instruction{margin:0;color:#f2f6ff;font-size:16px;font-weight:800}
   .aviator-countdown-wrap{margin:14px auto 12px;padding:7px 12px;min-height:61px;display:flex;align-items:center;justify-content:center;gap:10px;border-radius:15px;background:rgba(5,17,34,.72);border:1px solid rgba(71,147,255,.22);color:#a9bdd8;font-size:11px}
@@ -1072,6 +1074,7 @@
       <div id="aviatorSignalBackground" class="aviator-signal-background" aria-hidden="true"></div>
       <div id="aviatorAnimation" class="aviator-animation" aria-hidden="true"></div>
       <div id="aviatorLoadingBlocks" class="aviator-loading-blocks" aria-hidden="true"></div>
+      <div id="aviatorSplashAnimation" class="aviator-splash-animation" aria-hidden="true"></div>
       <div id="aviatorSignal" class="aviator-signal">1.30x</div>
     </div>
     <p id="aviatorInstruction" class="aviator-instruction">00:21 da 1.30x da yutuqni oling</p>
@@ -1348,6 +1351,7 @@
   const aviatorWaitingAnimation = document.getElementById("aviatorWaitingAnimation");
   const aviatorAnimation = document.getElementById("aviatorAnimation");
   const aviatorLoadingBlocks = document.getElementById("aviatorLoadingBlocks");
+  const aviatorSplashAnimation = document.getElementById("aviatorSplashAnimation");
   const aviatorSignal = document.getElementById("aviatorSignal");
   const aviatorInstruction = document.getElementById("aviatorInstruction");
   const aviatorCountdown = document.getElementById("aviatorCountdown");
@@ -1369,6 +1373,7 @@
   let aviatorBackgroundLottie = null;
   let aviatorWaitingLottie = null;
   let aviatorLoadingBlocksLottie = null;
+  let aviatorSplashLottie = null;
   let idLottieAnimation = null;
 
   function ensureAndroidButtonAnimation(){
@@ -1438,6 +1443,7 @@
 
   const AVIATOR_PAUSE = 60*1000;
   const AVIATOR_COUNTDOWN = 6*60*1000;
+  const AVIATOR_SPLASH_MS = 8*1000;
   const AVIATOR_INTERVAL = AVIATOR_PAUSE+AVIATOR_COUNTDOWN;
   const AVIATOR_STORAGE_KEY = "sunetAviatorSignalV2";
   let aviatorState = null;
@@ -1518,13 +1524,22 @@
     }
     const isPause = now < aviatorState.pauseUntil;
     const showWaiting = !isPause;
+    const waitingElapsed = Math.max(0,now-aviatorState.pauseUntil);
+    const waitingRemaining = Math.max(0,aviatorState.nextAt-now);
+    const showSplash = showWaiting && (waitingElapsed < AVIATOR_SPLASH_MS || waitingRemaining <= AVIATOR_SPLASH_MS);
+    const showBlocks = showWaiting && !showSplash;
     aviatorSignal.style.display = showWaiting ? "none" : "flex";
     aviatorAnimation.style.display = showWaiting ? "none" : "block";
     aviatorInstruction.style.visibility = showWaiting ? "hidden" : "visible";
-    aviatorLoadingBlocks.classList.toggle("active",showWaiting);
+    aviatorLoadingBlocks.classList.toggle("active",showBlocks);
+    aviatorSplashAnimation.classList.toggle("active",showSplash);
     if(aviatorLoadingBlocksLottie){
-      if(showWaiting) aviatorLoadingBlocksLottie.play();
+      if(showBlocks) aviatorLoadingBlocksLottie.play();
       else aviatorLoadingBlocksLottie.pause();
+    }
+    if(aviatorSplashLottie){
+      if(showSplash) aviatorSplashLottie.play();
+      else aviatorSplashLottie.pause();
     }
     const remaining = Math.max(0,(isPause ? aviatorState.pauseUntil : aviatorState.nextAt)-now);
     aviatorCountdownLabel.textContent = isPause ? t("signalPause") : t("nextSignal");
@@ -1564,6 +1579,16 @@
         path:"assets/loading-blocks.json?v=2"
       });
     }
+    if(!aviatorSplashLottie){
+      aviatorSplashLottie = lottie.loadAnimation({
+        container:aviatorSplashAnimation,
+        renderer:"svg",
+        rendererSettings:{preserveAspectRatio:"xMidYMid slice"},
+        loop:true,
+        autoplay:false,
+        path:"assets/aviator-splash-screen.json?v=1"
+      });
+    }
     if(!aviatorLottie){
       aviatorLottie = lottie.loadAnimation({
         container:aviatorAnimation,
@@ -1576,7 +1601,7 @@
     aviatorBackgroundLottie.play();
     aviatorWaitingLottie.play();
     aviatorLottie.play();
-    if(Date.now() >= aviatorState.pauseUntil) aviatorLoadingBlocksLottie.play();
+    tickAviator();
   }
 
   function openAviator(){
@@ -1604,6 +1629,7 @@
     if(aviatorBackgroundLottie) aviatorBackgroundLottie.pause();
     if(aviatorWaitingLottie) aviatorWaitingLottie.pause();
     if(aviatorLoadingBlocksLottie) aviatorLoadingBlocksLottie.pause();
+    if(aviatorSplashLottie) aviatorSplashLottie.pause();
     if(aviatorLottie) aviatorLottie.pause();
   }
 
@@ -1895,6 +1921,8 @@
       if(androidModalLottie) androidModalLottie.pause();
       if(activityLottie) activityLottie.pause();
       if(aviatorLottie) aviatorLottie.pause();
+      if(aviatorLoadingBlocksLottie) aviatorLoadingBlocksLottie.pause();
+      if(aviatorSplashLottie) aviatorSplashLottie.pause();
       if(aviatorButtonLottie) aviatorButtonLottie.pause();
       if(infoRulesLottie) infoRulesLottie.pause();
       if(idLottieAnimation) idLottieAnimation.pause();
