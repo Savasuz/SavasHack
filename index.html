@@ -165,9 +165,14 @@
   }
 
   .aviator-open-btn{
-    height:34px;
-    padding:0 12px;
-    border-radius:13px;
+    width:112px;
+    height:52px;
+    padding:3px 9px 3px 5px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:5px;
+    border-radius:16px;
     border:1px solid rgba(255,91,116,.46);
     background:rgba(34,8,20,.74);
     color:#fff;
@@ -175,7 +180,11 @@
     font-weight:900;
     cursor:pointer;
     box-shadow:0 0 18px rgba(255,62,96,.12),inset 0 1px 0 rgba(255,255,255,.06);
+    overflow:hidden;
   }
+
+  .aviator-button-animation{width:42px;height:42px;flex:0 0 42px;pointer-events:none}
+  .aviator-button-label{white-space:nowrap}
 
   .sub{
     margin:0 0 14px;
@@ -982,7 +991,8 @@
     .telegram-icon{width:42px;height:42px}
     .language-switcher{top:calc(20px + var(--safe-top));right:calc(66px + var(--safe-right));height:28px}
     .panel-heading{gap:7px}
-    .aviator-open-btn{padding:0 10px;font-size:11px}
+    .aviator-open-btn{width:106px;height:50px;padding:3px 7px 3px 4px;font-size:11px}
+    .aviator-button-animation{width:40px;height:40px;flex-basis:40px}
   }
 </style>
 </head>
@@ -1011,7 +1021,10 @@
   <div class="panel">
     <div class="panel-heading">
       <div class="title">SUNETUZ</div>
-      <button class="aviator-open-btn" type="button" onclick="openAviator()" data-i18n="aviator">Aviator</button>
+      <button class="aviator-open-btn" type="button" onclick="openAviator()" aria-label="Aviator">
+        <div id="aviatorButtonAnimation" class="aviator-button-animation" aria-hidden="true"></div>
+        <span class="aviator-button-label" data-i18n="aviator">Aviator</span>
+      </button>
     </div>
     <div class="grid">
       <div class="card" onclick="openGame('apple')"><img src="assets/apple.webp" alt="Apple"><div class="card-label">Apple</div></div>
@@ -1309,6 +1322,7 @@
   const activityAnimation = document.getElementById("activityAnimation");
   const activityCount = document.getElementById("activityCount");
   const aviatorModal = document.getElementById("aviatorModal");
+  const aviatorButtonAnimation = document.getElementById("aviatorButtonAnimation");
   const aviatorAnimation = document.getElementById("aviatorAnimation");
   const aviatorSignal = document.getElementById("aviatorSignal");
   const aviatorInstruction = document.getElementById("aviatorInstruction");
@@ -1325,6 +1339,7 @@
   let activityLottie = null;
   let activityTimer = null;
   let aviatorLottie = null;
+  let aviatorButtonLottie = null;
   let idLottieAnimation = null;
 
   function ensureAndroidButtonAnimation(){
@@ -1470,6 +1485,17 @@
       });
     }
     aviatorLottie.play();
+  }
+
+  function ensureAviatorButtonAnimation(){
+    if(!window.lottie || aviatorButtonLottie) return;
+    aviatorButtonLottie = lottie.loadAnimation({
+      container:aviatorButtonAnimation,
+      renderer:"svg",
+      loop:true,
+      autoplay:true,
+      path:"assets/aviator/animation.json"
+    });
   }
 
   function openAviator(){
@@ -1714,6 +1740,7 @@
   applyLanguage();
   ensureAndroidButtonAnimation();
   ensureActivityAnimation();
+  ensureAviatorButtonAnimation();
   nextActivityCount();
   scheduleActivityUpdate();
 
@@ -1771,6 +1798,7 @@
       if(androidModalLottie) androidModalLottie.pause();
       if(activityLottie) activityLottie.pause();
       if(aviatorLottie) aviatorLottie.pause();
+      if(aviatorButtonLottie) aviatorButtonLottie.pause();
       if(idLottieAnimation) idLottieAnimation.pause();
       return;
     }
@@ -1781,6 +1809,8 @@
     if(androidButtonLottie) androidButtonLottie.play();
     ensureActivityAnimation();
     if(activityLottie) activityLottie.play();
+    ensureAviatorButtonAnimation();
+    if(aviatorButtonLottie) aviatorButtonLottie.play();
     if(!aviatorModal.classList.contains("hidden")) ensureAviatorAnimation();
     if(!downloadModal.classList.contains("hidden")) ensureAndroidModalAnimation();
     if(!idModal.classList.contains("hidden")) ensureIdAnimation();
