@@ -728,7 +728,9 @@
   .aviator-animation{position:absolute;inset:0;z-index:1;width:100%;height:100%;transform:scale(1.18);filter:drop-shadow(0 0 5px rgba(255,35,83,.95)) drop-shadow(0 0 13px rgba(255,35,83,.55))}
   .aviator-signal{position:absolute;inset:0;z-index:2;display:flex;align-items:center;justify-content:center;margin:0;padding-top:4px;font-size:42px;font-weight:950;letter-spacing:-1px;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.95),0 0 24px rgba(255,70,105,.72);animation:aviatorGlow 2.2s ease-in-out infinite;pointer-events:none}
   .aviator-instruction{margin:0;color:#f2f6ff;font-size:16px;font-weight:800}
-  .aviator-countdown-wrap{margin:14px auto 12px;padding:9px 12px;border-radius:15px;background:rgba(5,17,34,.72);border:1px solid rgba(71,147,255,.22);color:#a9bdd8;font-size:11px}
+  .aviator-countdown-wrap{margin:14px auto 12px;padding:7px 12px;min-height:61px;display:flex;align-items:center;justify-content:center;gap:10px;border-radius:15px;background:rgba(5,17,34,.72);border:1px solid rgba(71,147,255,.22);color:#a9bdd8;font-size:11px}
+  .aviator-waiting-animation{width:48px;height:48px;flex:0 0 48px;overflow:hidden;filter:drop-shadow(0 0 8px rgba(105,223,255,.24))}
+  .aviator-countdown-copy{min-width:108px;text-align:center}
   .aviator-countdown{display:block;margin-top:2px;color:#69dfff;font-size:23px;font-weight:900;font-variant-numeric:tabular-nums}
   .aviator-history-title{margin:0 0 8px;color:#a9bdd8;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.07em}
   .aviator-history{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
@@ -1060,8 +1062,11 @@
     </div>
     <p id="aviatorInstruction" class="aviator-instruction">00:21 da 1.30x da yutuqni oling</p>
     <div class="aviator-countdown-wrap">
-      <span id="aviatorCountdownLabel">1 daqiqa pauza</span>
-      <strong id="aviatorCountdown" class="aviator-countdown">01:00</strong>
+      <div id="aviatorWaitingAnimation" class="aviator-waiting-animation" aria-hidden="true"></div>
+      <div class="aviator-countdown-copy">
+        <span id="aviatorCountdownLabel">1 daqiqa pauza</span>
+        <strong id="aviatorCountdown" class="aviator-countdown">01:00</strong>
+      </div>
     </div>
     <p class="aviator-history-title" data-i18n="signalHistory">Oxirgi 5 signal</p>
     <div id="aviatorHistory" class="aviator-history"></div>
@@ -1325,6 +1330,7 @@
   const aviatorModal = document.getElementById("aviatorModal");
   const aviatorButtonAnimation = document.getElementById("aviatorButtonAnimation");
   const aviatorSignalBackground = document.getElementById("aviatorSignalBackground");
+  const aviatorWaitingAnimation = document.getElementById("aviatorWaitingAnimation");
   const aviatorAnimation = document.getElementById("aviatorAnimation");
   const aviatorSignal = document.getElementById("aviatorSignal");
   const aviatorInstruction = document.getElementById("aviatorInstruction");
@@ -1344,6 +1350,7 @@
   let aviatorLottie = null;
   let aviatorButtonLottie = null;
   let aviatorBackgroundLottie = null;
+  let aviatorWaitingLottie = null;
   let idLottieAnimation = null;
 
   function ensureAndroidButtonAnimation(){
@@ -1500,6 +1507,15 @@
         path:"assets/pkg-background.json?v=1"
       });
     }
+    if(!aviatorWaitingLottie){
+      aviatorWaitingLottie = lottie.loadAnimation({
+        container:aviatorWaitingAnimation,
+        renderer:"svg",
+        loop:true,
+        autoplay:false,
+        path:"assets/waiting.json?v=1"
+      });
+    }
     if(!aviatorLottie){
       aviatorLottie = lottie.loadAnimation({
         container:aviatorAnimation,
@@ -1510,6 +1526,7 @@
       });
     }
     aviatorBackgroundLottie.play();
+    aviatorWaitingLottie.play();
     aviatorLottie.play();
   }
 
@@ -1536,6 +1553,7 @@
     if(event && event.target !== aviatorModal) return;
     aviatorModal.classList.add("hidden");
     if(aviatorBackgroundLottie) aviatorBackgroundLottie.pause();
+    if(aviatorWaitingLottie) aviatorWaitingLottie.pause();
     if(aviatorLottie) aviatorLottie.pause();
   }
 
