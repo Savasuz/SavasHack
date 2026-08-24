@@ -165,13 +165,12 @@
   }
 
   .aviator-open-btn{
-    width:112px;
+    width:62px;
     height:52px;
-    padding:3px 9px 3px 5px;
+    padding:2px;
     display:inline-flex;
     align-items:center;
     justify-content:center;
-    gap:5px;
     border-radius:16px;
     border:1px solid rgba(255,91,116,.46);
     background:rgba(34,8,20,.74);
@@ -183,8 +182,7 @@
     overflow:hidden;
   }
 
-  .aviator-button-animation{width:42px;height:42px;flex:0 0 42px;pointer-events:none}
-  .aviator-button-label{white-space:nowrap}
+  .aviator-button-animation{width:48px;height:48px;flex:0 0 48px;pointer-events:none}
 
   .sub{
     margin:0 0 14px;
@@ -991,8 +989,8 @@
     .telegram-icon{width:42px;height:42px}
     .language-switcher{top:calc(20px + var(--safe-top));right:calc(66px + var(--safe-right));height:28px}
     .panel-heading{gap:7px}
-    .aviator-open-btn{width:106px;height:50px;padding:3px 7px 3px 4px;font-size:11px}
-    .aviator-button-animation{width:40px;height:40px;flex-basis:40px}
+    .aviator-open-btn{width:60px;height:50px;padding:2px}
+    .aviator-button-animation{width:46px;height:46px;flex-basis:46px}
   }
 </style>
 </head>
@@ -1023,7 +1021,6 @@
       <div class="title">SUNETUZ</div>
       <button class="aviator-open-btn" type="button" onclick="openAviator()" aria-label="Aviator">
         <div id="aviatorButtonAnimation" class="aviator-button-animation" aria-hidden="true"></div>
-        <span class="aviator-button-label" data-i18n="aviator">Aviator</span>
       </button>
     </div>
     <div class="grid">
