@@ -157,12 +157,20 @@
   }
 
   .panel-heading{
+    position:relative;
     display:flex;
     align-items:center;
     justify-content:center;
     gap:10px;
     margin:0 0 8px;
   }
+
+  .info-rules-btn{position:absolute;right:0;top:50%;transform:translateY(-50%);width:40px;height:40px;padding:2px;border:0;background:transparent;cursor:pointer;filter:drop-shadow(0 0 8px rgba(51,214,255,.28))}
+  .info-rules-animation{width:100%;height:100%;pointer-events:none}
+
+  .aviator-bottom-btn{width:112px;height:40px;margin-top:14px;padding:0;border-radius:14px;border:1px solid rgba(255,72,112,.34);background:rgba(24,8,24,.82);cursor:pointer;overflow:hidden;box-shadow:0 0 18px rgba(255,54,99,.1),inset 0 1px 0 rgba(255,255,255,.05)}
+  .aviator-bottom-btn .aviator-button-animation{width:100%;height:100%}
+  .aviator-bottom-btn .aviator-button-animation svg{transform:scale(.66)!important}
 
   .aviator-open-btn{
     width:112px;
@@ -1027,8 +1035,8 @@
   <div class="panel">
     <div class="panel-heading">
       <div class="title">SUNETUZ</div>
-      <button class="aviator-open-btn" type="button" onclick="openAviator()" aria-label="Aviator">
-        <div id="aviatorButtonAnimation" class="aviator-button-animation" aria-hidden="true"></div>
+      <button class="info-rules-btn" type="button" onclick="openRules()" aria-label="Qoidalar">
+        <div id="infoRulesAnimation" class="info-rules-animation" aria-hidden="true"></div>
       </button>
     </div>
     <div class="grid">
@@ -1038,7 +1046,9 @@
       <div class="card" onclick="openGame('swamp')"><img src="assets/swamp.webp" alt="Swamp Land"><div class="card-label">Swamp Land</div></div>
     </div>
     <div class="panel-actions">
-      <button class="rules-btn" type="button" onclick="openRules()">📋 <span data-i18n="rules">Qoidalar</span></button>
+      <button class="aviator-bottom-btn" type="button" onclick="openAviator()" aria-label="Aviator">
+        <div id="aviatorButtonAnimation" class="aviator-button-animation" aria-hidden="true"></div>
+      </button>
       <button class="android-btn" type="button" onclick="openDownload()" aria-label="Android APK">
         <div id="androidAnimation" class="android-animation" aria-hidden="true"></div>
       </button>
@@ -1333,6 +1343,7 @@
   const activityCount = document.getElementById("activityCount");
   const aviatorModal = document.getElementById("aviatorModal");
   const aviatorButtonAnimation = document.getElementById("aviatorButtonAnimation");
+  const infoRulesAnimation = document.getElementById("infoRulesAnimation");
   const aviatorSignalBackground = document.getElementById("aviatorSignalBackground");
   const aviatorWaitingAnimation = document.getElementById("aviatorWaitingAnimation");
   const aviatorAnimation = document.getElementById("aviatorAnimation");
@@ -1354,6 +1365,7 @@
   let activityTimer = null;
   let aviatorLottie = null;
   let aviatorButtonLottie = null;
+  let infoRulesLottie = null;
   let aviatorBackgroundLottie = null;
   let aviatorWaitingLottie = null;
   let aviatorLoadingBlocksLottie = null;
@@ -1367,6 +1379,17 @@
       loop:true,
       autoplay:true,
       path:"assets/android-part.json"
+    });
+  }
+
+  function ensureInfoRulesAnimation(){
+    if(!window.lottie || infoRulesLottie) return;
+    infoRulesLottie = lottie.loadAnimation({
+      container:infoRulesAnimation,
+      renderer:"svg",
+      loop:true,
+      autoplay:true,
+      path:"assets/info.json?v=1"
     });
   }
 
@@ -1814,6 +1837,7 @@
   ensureAndroidButtonAnimation();
   ensureActivityAnimation();
   ensureAviatorButtonAnimation();
+  ensureInfoRulesAnimation();
   nextActivityCount();
   scheduleActivityUpdate();
 
@@ -1872,6 +1896,7 @@
       if(activityLottie) activityLottie.pause();
       if(aviatorLottie) aviatorLottie.pause();
       if(aviatorButtonLottie) aviatorButtonLottie.pause();
+      if(infoRulesLottie) infoRulesLottie.pause();
       if(idLottieAnimation) idLottieAnimation.pause();
       return;
     }
@@ -1884,6 +1909,8 @@
     if(activityLottie) activityLottie.play();
     ensureAviatorButtonAnimation();
     if(aviatorButtonLottie) aviatorButtonLottie.play();
+    ensureInfoRulesAnimation();
+    if(infoRulesLottie) infoRulesLottie.play();
     if(!aviatorModal.classList.contains("hidden")) ensureAviatorAnimation();
     if(!downloadModal.classList.contains("hidden")) ensureAndroidModalAnimation();
     if(!idModal.classList.contains("hidden")) ensureIdAnimation();
