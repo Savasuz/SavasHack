@@ -723,9 +723,9 @@
   .aviator-title{margin:2px 42px 5px;min-height:36px;display:flex;align-items:center;justify-content:center}
   .aviator-title-logo{display:block;width:152px;max-width:100%;height:auto;object-fit:contain;filter:drop-shadow(0 0 12px rgba(255,25,72,.28))}
   .aviator-signal-badge{display:inline-block;padding:4px 9px;border-radius:999px;background:rgba(255,67,103,.12);border:1px solid rgba(255,91,116,.32);color:#ff91a6;font-size:10px;font-weight:900;letter-spacing:.08em}
-  .aviator-animation-frame{width:100%;height:118px;margin:10px auto 6px;border-radius:19px;overflow:hidden;border:1px solid rgba(79,158,255,.28);background:rgba(2,9,20,.62);box-shadow:inset 0 0 28px rgba(44,132,255,.08)}
-  .aviator-animation{width:100%;height:100%}
-  .aviator-signal{margin:7px 0 2px;font-size:42px;font-weight:950;letter-spacing:-1px;color:#ff5f7d;text-shadow:0 0 22px rgba(255,70,105,.42);animation:aviatorGlow 2.2s ease-in-out infinite}
+  .aviator-animation-frame{position:relative;width:100%;height:190px;margin:10px auto 8px;border-radius:24px;overflow:hidden;border:1px solid rgba(79,158,255,.28);background:radial-gradient(circle at 50% 48%,rgba(41,78,142,.28),rgba(2,9,20,.68) 62%);box-shadow:inset 0 0 34px rgba(44,132,255,.1)}
+  .aviator-animation{position:absolute;inset:0;width:100%;height:100%;transform:scale(1.18)}
+  .aviator-signal{position:absolute;inset:0;z-index:2;display:flex;align-items:center;justify-content:center;margin:0;padding-top:4px;font-size:42px;font-weight:950;letter-spacing:-1px;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.95),0 0 24px rgba(255,70,105,.72);animation:aviatorGlow 2.2s ease-in-out infinite;pointer-events:none}
   .aviator-instruction{margin:0;color:#f2f6ff;font-size:16px;font-weight:800}
   .aviator-countdown-wrap{margin:14px auto 12px;padding:9px 12px;border-radius:15px;background:rgba(5,17,34,.72);border:1px solid rgba(71,147,255,.22);color:#a9bdd8;font-size:11px}
   .aviator-countdown{display:block;margin-top:2px;color:#69dfff;font-size:23px;font-weight:900;font-variant-numeric:tabular-nums}
@@ -1054,12 +1054,12 @@
     <span class="aviator-signal-badge" data-i18n="signalType">TAHLILIY SIGNAL</span>
     <div class="aviator-animation-frame">
       <div id="aviatorAnimation" class="aviator-animation" aria-hidden="true"></div>
+      <div id="aviatorSignal" class="aviator-signal">1.30x</div>
     </div>
-    <div id="aviatorSignal" class="aviator-signal">1.30x</div>
-    <p id="aviatorInstruction" class="aviator-instruction">1.30x da yutuqni oling</p>
+    <p id="aviatorInstruction" class="aviator-instruction">00:21 da 1.30x da yutuqni oling</p>
     <div class="aviator-countdown-wrap">
-      <span data-i18n="nextSignal">Keyingi signal</span>
-      <strong id="aviatorCountdown" class="aviator-countdown">06:00</strong>
+      <span id="aviatorCountdownLabel">1 daqiqa pauza</span>
+      <strong id="aviatorCountdown" class="aviator-countdown">01:00</strong>
     </div>
     <p class="aviator-history-title" data-i18n="signalHistory">Oxirgi 5 signal</p>
     <div id="aviatorHistory" class="aviator-history"></div>
@@ -1223,7 +1223,7 @@
       downloadQuestion:"BetWinner APK faylini yuklab olishni davom ettirasizmi?", cancel:"Bekor qilish", continue:"Davom etish",
       estimatedActivity:"Taxminiy faollik", activeNow:"faol", aviator:"Aviator",
       signalType:"TAHLILIY SIGNAL", nextSignal:"Keyingi signal", signalHistory:"Oxirgi 5 signal",
-      aviatorInstruction:x=>`${x}x da yutuqni oling`, signalDisclaimer:"Tahlil qilingan signal, natija kafolatlanmaydi"
+      aviatorInstruction:(time,x)=>`Soat ${time} da ${x}x koeffitsientda oling`, signalPause:"1 daqiqa pauza", signalDisclaimer:"Tahlil qilingan signal, natija kafolatlanmaydi"
     },
     ru:{
       offline:"Офлайн", online:"Онлайн", settings:"Настройки", telegram:"Telegram / Поддержка",
@@ -1241,7 +1241,7 @@
       downloadQuestion:"Продолжить получение BetWinner APK?", cancel:"Отмена", continue:"Продолжить",
       estimatedActivity:"Примерная активность", activeNow:"активны", aviator:"Aviator",
       signalType:"АНАЛИТИЧЕСКИЙ СИГНАЛ", nextSignal:"Следующий сигнал", signalHistory:"Последние 5 сигналов",
-      aviatorInstruction:x=>`Заберите выигрыш на ${x}x`, signalDisclaimer:"Аналитический сигнал, результат не гарантирован"
+      aviatorInstruction:(time,x)=>`В ${time} заберите на коэффициенте ${x}x`, signalPause:"Пауза 1 минута", signalDisclaimer:"Аналитический сигнал, результат не гарантирован"
     },
     en:{
       offline:"Offline", online:"Online", settings:"Settings", telegram:"Telegram / Support",
@@ -1259,7 +1259,7 @@
       downloadQuestion:"Continue to get the BetWinner APK?", cancel:"Cancel", continue:"Continue",
       estimatedActivity:"Estimated activity", activeNow:"active", aviator:"Aviator",
       signalType:"ANALYZED SIGNAL", nextSignal:"Next signal", signalHistory:"Last 5 signals",
-      aviatorInstruction:x=>`Collect at ${x}x`, signalDisclaimer:"Analyzed signal; results are not guaranteed"
+      aviatorInstruction:(time,x)=>`At ${time}, collect at ${x}x`, signalPause:"1 minute pause", signalDisclaimer:"Analyzed signal; results are not guaranteed"
     }
   };
 
@@ -1326,6 +1326,7 @@
   const aviatorSignal = document.getElementById("aviatorSignal");
   const aviatorInstruction = document.getElementById("aviatorInstruction");
   const aviatorCountdown = document.getElementById("aviatorCountdown");
+  const aviatorCountdownLabel = document.getElementById("aviatorCountdownLabel");
   const aviatorHistory = document.getElementById("aviatorHistory");
   const idModal = document.getElementById("idModal");
   const idAnimation = document.getElementById("idAnimation");
@@ -1395,8 +1396,10 @@
     },(5+Math.random()*5)*60*1000);
   }
 
-  const AVIATOR_INTERVAL = 6*60*1000;
-  const AVIATOR_STORAGE_KEY = "sunetAviatorSignalV1";
+  const AVIATOR_PAUSE = 60*1000;
+  const AVIATOR_COUNTDOWN = 6*60*1000;
+  const AVIATOR_INTERVAL = AVIATOR_PAUSE+AVIATOR_COUNTDOWN;
+  const AVIATOR_STORAGE_KEY = "sunetAviatorSignalV2";
   let aviatorState = null;
 
   function generateAviatorSignal(){
@@ -1407,6 +1410,8 @@
     const now = Date.now();
     return {
       current:generateAviatorSignal(),
+      currentAt:now,
+      pauseUntil:now+AVIATOR_PAUSE,
       nextAt:now+AVIATOR_INTERVAL,
       history:Array.from({length:5},(_,index)=>({
         value:generateAviatorSignal(),
@@ -1421,7 +1426,7 @@
 
   function loadAviatorState(){
     try{ aviatorState = JSON.parse(localStorage.getItem(AVIATOR_STORAGE_KEY)); }catch(_){ aviatorState = null; }
-    if(!aviatorState || !Number.isFinite(aviatorState.current) || !Number.isFinite(aviatorState.nextAt) || !Array.isArray(aviatorState.history)){
+    if(!aviatorState || !Number.isFinite(aviatorState.current) || !Number.isFinite(aviatorState.currentAt) || !Number.isFinite(aviatorState.pauseUntil) || !Number.isFinite(aviatorState.nextAt) || !Array.isArray(aviatorState.history)){
       aviatorState = createAviatorState();
       saveAviatorState();
       return;
@@ -1430,8 +1435,10 @@
     let steps = 0;
     const now = Date.now();
     while(now >= aviatorState.nextAt && steps < 5){
-      aviatorState.history.unshift({value:aviatorState.current,time:aviatorState.nextAt});
+      aviatorState.history.unshift({value:aviatorState.current,time:aviatorState.currentAt});
       aviatorState.current = generateAviatorSignal();
+      aviatorState.currentAt = aviatorState.nextAt;
+      aviatorState.pauseUntil = aviatorState.currentAt+AVIATOR_PAUSE;
       aviatorState.nextAt += AVIATOR_INTERVAL;
       steps++;
     }
@@ -1447,8 +1454,9 @@
   function renderAviator(){
     if(!aviatorState) return;
     const coefficient = aviatorState.current.toFixed(2);
+    const signalTime = new Date(aviatorState.currentAt).toLocaleTimeString(aviatorLocale(),{hour:"2-digit",minute:"2-digit"});
     aviatorSignal.textContent = coefficient+"x";
-    aviatorInstruction.textContent = t("aviatorInstruction",coefficient);
+    aviatorInstruction.textContent = t("aviatorInstruction",signalTime,coefficient);
     aviatorHistory.innerHTML = aviatorState.history.slice(0,5).map(item=>{
       const time = new Date(item.time).toLocaleTimeString(aviatorLocale(),{hour:"2-digit",minute:"2-digit"});
       return `<div class="aviator-history-item"><span class="aviator-history-x">${Number(item.value).toFixed(2)}x</span><span class="aviator-history-time">${time}</span></div>`;
@@ -1459,14 +1467,18 @@
     if(!aviatorState) return;
     const now = Date.now();
     if(now >= aviatorState.nextAt){
-      aviatorState.history.unshift({value:aviatorState.current,time:now});
+      aviatorState.history.unshift({value:aviatorState.current,time:aviatorState.currentAt});
       aviatorState.history = aviatorState.history.slice(0,5);
       aviatorState.current = generateAviatorSignal();
+      aviatorState.currentAt = now;
+      aviatorState.pauseUntil = now+AVIATOR_PAUSE;
       aviatorState.nextAt = now+AVIATOR_INTERVAL;
       saveAviatorState();
       renderAviator();
     }
-    const remaining = Math.max(0,aviatorState.nextAt-now);
+    const isPause = now < aviatorState.pauseUntil;
+    const remaining = Math.max(0,(isPause ? aviatorState.pauseUntil : aviatorState.nextAt)-now);
+    aviatorCountdownLabel.textContent = isPause ? t("signalPause") : t("nextSignal");
     const minutes = Math.floor(remaining/60000);
     const seconds = Math.floor((remaining%60000)/1000);
     aviatorCountdown.textContent = String(minutes).padStart(2,"0")+":"+String(seconds).padStart(2,"0");
@@ -1480,7 +1492,7 @@
         renderer:"svg",
         loop:true,
         autoplay:false,
-        path:"assets/aviator/animation.json"
+        path:"assets/loader-teyyare.json"
       });
     }
     aviatorLottie.play();
