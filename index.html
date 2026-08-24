@@ -726,6 +726,9 @@
   .aviator-animation-frame{position:relative;width:100%;height:190px;margin:10px auto 8px;border-radius:24px;overflow:hidden;border:1px solid rgba(255,72,112,.42);background:radial-gradient(circle at 50% 48%,rgba(43,91,170,.34),rgba(2,9,20,.72) 65%);box-shadow:inset 0 0 38px rgba(53,143,255,.14),0 0 20px rgba(255,54,99,.08)}
   .aviator-signal-background{position:absolute;inset:0;z-index:0;width:100%;height:100%;opacity:.72;pointer-events:none}
   .aviator-animation{position:absolute;inset:0;z-index:1;width:100%;height:100%;transform:scale(1.18);filter:drop-shadow(0 0 5px rgba(255,35,83,.95)) drop-shadow(0 0 13px rgba(255,35,83,.55))}
+  .aviator-loading-blocks{position:absolute;inset:0;z-index:3;display:none;align-items:center;justify-content:center;width:100%;height:100%;filter:drop-shadow(0 0 12px rgba(105,223,255,.2))}
+  .aviator-loading-blocks.active{display:flex}
+  .aviator-loading-blocks svg{width:100%!important;height:100%!important}
   .aviator-signal{position:absolute;inset:0;z-index:2;display:flex;align-items:center;justify-content:center;margin:0;padding-top:4px;font-size:42px;font-weight:950;letter-spacing:-1px;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.95),0 0 24px rgba(255,70,105,.72);animation:aviatorGlow 2.2s ease-in-out infinite;pointer-events:none}
   .aviator-instruction{margin:0;color:#f2f6ff;font-size:16px;font-weight:800}
   .aviator-countdown-wrap{margin:14px auto 12px;padding:7px 12px;min-height:61px;display:flex;align-items:center;justify-content:center;gap:10px;border-radius:15px;background:rgba(5,17,34,.72);border:1px solid rgba(71,147,255,.22);color:#a9bdd8;font-size:11px}
@@ -1058,6 +1061,7 @@
     <div class="aviator-animation-frame">
       <div id="aviatorSignalBackground" class="aviator-signal-background" aria-hidden="true"></div>
       <div id="aviatorAnimation" class="aviator-animation" aria-hidden="true"></div>
+      <div id="aviatorLoadingBlocks" class="aviator-loading-blocks" aria-hidden="true"></div>
       <div id="aviatorSignal" class="aviator-signal">1.30x</div>
     </div>
     <p id="aviatorInstruction" class="aviator-instruction">00:21 da 1.30x da yutuqni oling</p>
@@ -1332,6 +1336,7 @@
   const aviatorSignalBackground = document.getElementById("aviatorSignalBackground");
   const aviatorWaitingAnimation = document.getElementById("aviatorWaitingAnimation");
   const aviatorAnimation = document.getElementById("aviatorAnimation");
+  const aviatorLoadingBlocks = document.getElementById("aviatorLoadingBlocks");
   const aviatorSignal = document.getElementById("aviatorSignal");
   const aviatorInstruction = document.getElementById("aviatorInstruction");
   const aviatorCountdown = document.getElementById("aviatorCountdown");
@@ -1351,6 +1356,7 @@
   let aviatorButtonLottie = null;
   let aviatorBackgroundLottie = null;
   let aviatorWaitingLottie = null;
+  let aviatorLoadingBlocksLottie = null;
   let idLottieAnimation = null;
 
   function ensureAndroidButtonAnimation(){
@@ -1488,6 +1494,15 @@
       renderAviator();
     }
     const isPause = now < aviatorState.pauseUntil;
+    const showWaiting = !isPause;
+    aviatorSignal.style.display = showWaiting ? "none" : "flex";
+    aviatorAnimation.style.display = showWaiting ? "none" : "block";
+    aviatorInstruction.style.visibility = showWaiting ? "hidden" : "visible";
+    aviatorLoadingBlocks.classList.toggle("active",showWaiting);
+    if(aviatorLoadingBlocksLottie){
+      if(showWaiting) aviatorLoadingBlocksLottie.play();
+      else aviatorLoadingBlocksLottie.pause();
+    }
     const remaining = Math.max(0,(isPause ? aviatorState.pauseUntil : aviatorState.nextAt)-now);
     aviatorCountdownLabel.textContent = isPause ? t("signalPause") : t("nextSignal");
     const minutes = Math.floor(remaining/60000);
@@ -1516,6 +1531,16 @@
         path:"assets/waiting.json?v=1"
       });
     }
+    if(!aviatorLoadingBlocksLottie){
+      aviatorLoadingBlocksLottie = lottie.loadAnimation({
+        container:aviatorLoadingBlocks,
+        renderer:"svg",
+        rendererSettings:{preserveAspectRatio:"xMidYMid meet"},
+        loop:true,
+        autoplay:false,
+        path:"assets/loading-blocks.json?v=1"
+      });
+    }
     if(!aviatorLottie){
       aviatorLottie = lottie.loadAnimation({
         container:aviatorAnimation,
@@ -1528,6 +1553,7 @@
     aviatorBackgroundLottie.play();
     aviatorWaitingLottie.play();
     aviatorLottie.play();
+    if(Date.now() >= aviatorState.pauseUntil) aviatorLoadingBlocksLottie.play();
   }
 
   function openAviator(){
@@ -1554,6 +1580,7 @@
     aviatorModal.classList.add("hidden");
     if(aviatorBackgroundLottie) aviatorBackgroundLottie.pause();
     if(aviatorWaitingLottie) aviatorWaitingLottie.pause();
+    if(aviatorLoadingBlocksLottie) aviatorLoadingBlocksLottie.pause();
     if(aviatorLottie) aviatorLottie.pause();
   }
 
