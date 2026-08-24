@@ -147,13 +147,34 @@
   }
 
   .title{
-    margin:0 0 8px;
+    margin:0;
     font-size:28px;
     font-weight:800;
     letter-spacing:-1px;
     background:linear-gradient(90deg,#fff,#8ddfff);
     -webkit-background-clip:text;
     color:transparent;
+  }
+
+  .panel-heading{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    margin:0 0 8px;
+  }
+
+  .aviator-open-btn{
+    height:34px;
+    padding:0 12px;
+    border-radius:13px;
+    border:1px solid rgba(255,91,116,.46);
+    background:rgba(34,8,20,.74);
+    color:#fff;
+    font-size:12px;
+    font-weight:900;
+    cursor:pointer;
+    box-shadow:0 0 18px rgba(255,62,96,.12),inset 0 1px 0 rgba(255,255,255,.06);
   }
 
   .sub{
@@ -649,6 +670,65 @@
   .activity-label{font-size:8px;letter-spacing:.035em;color:rgba(138,181,174,.72);font-weight:700}
   .activity-value{font-size:13px;color:#58f5b0;font-weight:900}
 
+  .aviator-overlay{
+    position:fixed;
+    inset:0;
+    z-index:140;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:max(18px,var(--safe-top)) 18px max(18px,var(--safe-bottom));
+    background:rgba(0,3,10,.84);
+    backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px);
+    overflow-y:auto;
+  }
+
+  .aviator-modal{
+    position:relative;
+    width:100%;
+    max-width:360px;
+    padding:20px 18px 18px;
+    border-radius:26px;
+    border:1px solid rgba(69,151,255,.42);
+    background:
+      radial-gradient(circle at 50% 16%,rgba(174,35,68,.18),transparent 34%),
+      linear-gradient(155deg,rgba(8,24,45,.99),rgba(2,7,17,.99));
+    text-align:center;
+    box-shadow:0 28px 80px rgba(0,0,0,.72),0 0 34px rgba(44,132,255,.2);
+  }
+
+  .aviator-close{
+    position:absolute;
+    top:12px;
+    right:12px;
+    width:34px;
+    height:34px;
+    border:1px solid rgba(104,166,255,.28);
+    border-radius:12px;
+    background:rgba(4,13,27,.78);
+    color:#cfe3ff;
+    font-size:20px;
+    cursor:pointer;
+  }
+
+  .aviator-title{margin:2px 38px 4px;color:#fff;font-size:22px}
+  .aviator-demo-badge{display:inline-block;padding:4px 9px;border-radius:999px;background:rgba(255,67,103,.12);border:1px solid rgba(255,91,116,.32);color:#ff91a6;font-size:10px;font-weight:900;letter-spacing:.08em}
+  .aviator-animation-frame{width:100%;height:118px;margin:10px auto 6px;border-radius:19px;overflow:hidden;border:1px solid rgba(79,158,255,.28);background:rgba(2,9,20,.62);box-shadow:inset 0 0 28px rgba(44,132,255,.08)}
+  .aviator-animation{width:100%;height:100%}
+  .aviator-signal{margin:7px 0 2px;font-size:42px;font-weight:950;letter-spacing:-1px;color:#ff5f7d;text-shadow:0 0 22px rgba(255,70,105,.42);animation:aviatorGlow 2.2s ease-in-out infinite}
+  .aviator-instruction{margin:0;color:#f2f6ff;font-size:16px;font-weight:800}
+  .aviator-countdown-wrap{margin:14px auto 12px;padding:9px 12px;border-radius:15px;background:rgba(5,17,34,.72);border:1px solid rgba(71,147,255,.22);color:#a9bdd8;font-size:11px}
+  .aviator-countdown{display:block;margin-top:2px;color:#69dfff;font-size:23px;font-weight:900;font-variant-numeric:tabular-nums}
+  .aviator-history-title{margin:0 0 8px;color:#a9bdd8;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.07em}
+  .aviator-history{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+  .aviator-history-item{padding:8px 2px 6px;border-radius:12px;background:rgba(5,17,34,.76);border:1px solid rgba(75,155,255,.18)}
+  .aviator-history-x{display:block;color:#b9e9ff;font-size:13px;font-weight:900}
+  .aviator-history-time{display:block;margin-top:3px;color:#71849e;font-size:9px}
+  .aviator-disclaimer{margin:13px 0 0;color:#8fa3bd;font-size:11px;line-height:1.45}
+
+  @keyframes aviatorGlow{50%{filter:brightness(1.16);transform:scale(1.025)}}
+
   .download-overlay{
     position:fixed;
     inset:0;
@@ -901,6 +981,8 @@
     .telegram{top:calc(12px + var(--safe-top));right:calc(12px + var(--safe-right));width:44px;height:44px}
     .telegram-icon{width:42px;height:42px}
     .language-switcher{top:calc(20px + var(--safe-top));right:calc(66px + var(--safe-right));height:28px}
+    .panel-heading{gap:7px}
+    .aviator-open-btn{padding:0 10px;font-size:11px}
   }
 </style>
 </head>
@@ -927,7 +1009,10 @@
 <!-- MENU -->
 <div id="menuScreen" class="screen">
   <div class="panel">
-    <div class="title">SUNETUZ</div>
+    <div class="panel-heading">
+      <div class="title">SUNETUZ</div>
+      <button class="aviator-open-btn" type="button" onclick="openAviator()" data-i18n="aviator">Aviator</button>
+    </div>
     <div class="grid">
       <div class="card" onclick="openGame('apple')"><img src="assets/apple.webp" alt="Apple"><div class="card-label">Apple</div></div>
       <div class="card" onclick="openGame('thimbles')"><img src="assets/thimbles.webp" alt="Thimbles"><div class="card-label">Thimbles</div></div>
@@ -947,6 +1032,26 @@
         </div>
       </div>
     </div>
+  </div>
+</div>
+
+<div id="aviatorModal" class="aviator-overlay hidden" onclick="closeAviator(event)">
+  <div class="aviator-modal" role="dialog" aria-modal="true" aria-labelledby="aviatorTitle">
+    <button class="aviator-close" type="button" onclick="closeAviator()" aria-label="Yopish">×</button>
+    <h2 id="aviatorTitle" class="aviator-title" data-i18n="aviator">Aviator</h2>
+    <span class="aviator-demo-badge" data-i18n="demoSignal">DEMO SIGNAL</span>
+    <div class="aviator-animation-frame">
+      <div id="aviatorAnimation" class="aviator-animation" aria-hidden="true"></div>
+    </div>
+    <div id="aviatorSignal" class="aviator-signal">1.30x</div>
+    <p id="aviatorInstruction" class="aviator-instruction">1.30x da yutuqni oling</p>
+    <div class="aviator-countdown-wrap">
+      <span data-i18n="nextSignal">Keyingi demo signal</span>
+      <strong id="aviatorCountdown" class="aviator-countdown">06:00</strong>
+    </div>
+    <p class="aviator-history-title" data-i18n="signalHistory">Oxirgi 5 demo signal</p>
+    <div id="aviatorHistory" class="aviator-history"></div>
+    <p class="aviator-disclaimer" data-i18n="signalDisclaimer">Tahlil qilingan signal, natija kafolatlanmaydi</p>
   </div>
 </div>
 
@@ -1104,7 +1209,9 @@
       rowResult:n=>`${n}-qatorni bosing!`, optionResult:n=>`${n}-variantni bosing!`,
       rangeFive:"1 dan 5 gacha", rangeThree:"1 dan 3 gacha", language:"Tilni tanlash",
       downloadQuestion:"BetWinner APK faylini yuklab olishni davom ettirasizmi?", cancel:"Bekor qilish", continue:"Davom etish",
-      estimatedActivity:"Taxminiy faollik", activeNow:"faol"
+      estimatedActivity:"Taxminiy faollik", activeNow:"faol", aviator:"Aviator",
+      demoSignal:"DEMO SIGNAL", nextSignal:"Keyingi demo signal", signalHistory:"Oxirgi 5 demo signal",
+      aviatorInstruction:x=>`${x}x da yutuqni oling`, signalDisclaimer:"Tahlil qilingan signal, natija kafolatlanmaydi"
     },
     ru:{
       offline:"Офлайн", online:"Онлайн", settings:"Настройки", telegram:"Telegram / Поддержка",
@@ -1120,7 +1227,9 @@
       rowResult:n=>`Нажмите на ${n}-й ряд!`, optionResult:n=>`Выберите ${n}-й вариант!`,
       rangeFive:"От 1 до 5", rangeThree:"От 1 до 3", language:"Выбор языка",
       downloadQuestion:"Продолжить получение BetWinner APK?", cancel:"Отмена", continue:"Продолжить",
-      estimatedActivity:"Примерная активность", activeNow:"активны"
+      estimatedActivity:"Примерная активность", activeNow:"активны", aviator:"Aviator",
+      demoSignal:"ДЕМО-СИГНАЛ", nextSignal:"Следующий демо-сигнал", signalHistory:"Последние 5 демо-сигналов",
+      aviatorInstruction:x=>`Заберите выигрыш на ${x}x`, signalDisclaimer:"Аналитический сигнал, результат не гарантирован"
     },
     en:{
       offline:"Offline", online:"Online", settings:"Settings", telegram:"Telegram / Support",
@@ -1136,7 +1245,9 @@
       rowResult:n=>`Tap row ${n}!`, optionResult:n=>`Choose option ${n}!`,
       rangeFive:"From 1 to 5", rangeThree:"From 1 to 3", language:"Select language",
       downloadQuestion:"Continue to get the BetWinner APK?", cancel:"Cancel", continue:"Continue",
-      estimatedActivity:"Estimated activity", activeNow:"active"
+      estimatedActivity:"Estimated activity", activeNow:"active", aviator:"Aviator",
+      demoSignal:"DEMO SIGNAL", nextSignal:"Next demo signal", signalHistory:"Last 5 demo signals",
+      aviatorInstruction:x=>`Collect at ${x}x`, signalDisclaimer:"Analyzed signal; results are not guaranteed"
     }
   };
 
@@ -1174,6 +1285,7 @@
     betwinnerIdInput.placeholder = t("enterId");
     statusEl.setAttribute("aria-label",active ? t("online") : t("offline"));
     refreshDynamicText();
+    renderAviator();
   }
 
   function setLanguage(language){
@@ -1196,6 +1308,12 @@
   const downloadModalAnimation = document.getElementById("downloadModalAnimation");
   const activityAnimation = document.getElementById("activityAnimation");
   const activityCount = document.getElementById("activityCount");
+  const aviatorModal = document.getElementById("aviatorModal");
+  const aviatorAnimation = document.getElementById("aviatorAnimation");
+  const aviatorSignal = document.getElementById("aviatorSignal");
+  const aviatorInstruction = document.getElementById("aviatorInstruction");
+  const aviatorCountdown = document.getElementById("aviatorCountdown");
+  const aviatorHistory = document.getElementById("aviatorHistory");
   const idModal = document.getElementById("idModal");
   const idAnimation = document.getElementById("idAnimation");
   const betwinnerIdInput = document.getElementById("betwinnerIdInput");
@@ -1206,6 +1324,7 @@
   let androidModalLottie = null;
   let activityLottie = null;
   let activityTimer = null;
+  let aviatorLottie = null;
   let idLottieAnimation = null;
 
   function ensureAndroidButtonAnimation(){
@@ -1261,6 +1380,114 @@
       scheduleActivityUpdate();
     },(5+Math.random()*5)*60*1000);
   }
+
+  const AVIATOR_INTERVAL = 6*60*1000;
+  const AVIATOR_STORAGE_KEY = "sunetAviatorDemoV1";
+  let aviatorState = null;
+
+  function generateAviatorSignal(){
+    return (Math.floor(Math.random()*101)+120)/100;
+  }
+
+  function createAviatorState(){
+    const now = Date.now();
+    return {
+      current:generateAviatorSignal(),
+      nextAt:now+AVIATOR_INTERVAL,
+      history:Array.from({length:5},(_,index)=>({
+        value:generateAviatorSignal(),
+        time:now-(index+1)*AVIATOR_INTERVAL
+      }))
+    };
+  }
+
+  function saveAviatorState(){
+    localStorage.setItem(AVIATOR_STORAGE_KEY,JSON.stringify(aviatorState));
+  }
+
+  function loadAviatorState(){
+    try{ aviatorState = JSON.parse(localStorage.getItem(AVIATOR_STORAGE_KEY)); }catch(_){ aviatorState = null; }
+    if(!aviatorState || !Number.isFinite(aviatorState.current) || !Number.isFinite(aviatorState.nextAt) || !Array.isArray(aviatorState.history)){
+      aviatorState = createAviatorState();
+      saveAviatorState();
+      return;
+    }
+
+    let steps = 0;
+    const now = Date.now();
+    while(now >= aviatorState.nextAt && steps < 5){
+      aviatorState.history.unshift({value:aviatorState.current,time:aviatorState.nextAt});
+      aviatorState.current = generateAviatorSignal();
+      aviatorState.nextAt += AVIATOR_INTERVAL;
+      steps++;
+    }
+    if(now >= aviatorState.nextAt) aviatorState.nextAt = now+AVIATOR_INTERVAL;
+    aviatorState.history = aviatorState.history.slice(0,5);
+    saveAviatorState();
+  }
+
+  function aviatorLocale(){
+    return currentLanguage === "ru" ? "ru-RU" : currentLanguage === "en" ? "en-GB" : "uz-UZ";
+  }
+
+  function renderAviator(){
+    if(!aviatorState) return;
+    const coefficient = aviatorState.current.toFixed(2);
+    aviatorSignal.textContent = coefficient+"x";
+    aviatorInstruction.textContent = t("aviatorInstruction",coefficient);
+    aviatorHistory.innerHTML = aviatorState.history.slice(0,5).map(item=>{
+      const time = new Date(item.time).toLocaleTimeString(aviatorLocale(),{hour:"2-digit",minute:"2-digit"});
+      return `<div class="aviator-history-item"><span class="aviator-history-x">${Number(item.value).toFixed(2)}x</span><span class="aviator-history-time">${time}</span></div>`;
+    }).join("");
+  }
+
+  function tickAviator(){
+    if(!aviatorState) return;
+    const now = Date.now();
+    if(now >= aviatorState.nextAt){
+      aviatorState.history.unshift({value:aviatorState.current,time:now});
+      aviatorState.history = aviatorState.history.slice(0,5);
+      aviatorState.current = generateAviatorSignal();
+      aviatorState.nextAt = now+AVIATOR_INTERVAL;
+      saveAviatorState();
+      renderAviator();
+    }
+    const remaining = Math.max(0,aviatorState.nextAt-now);
+    const minutes = Math.floor(remaining/60000);
+    const seconds = Math.floor((remaining%60000)/1000);
+    aviatorCountdown.textContent = String(minutes).padStart(2,"0")+":"+String(seconds).padStart(2,"0");
+  }
+
+  function ensureAviatorAnimation(){
+    if(!window.lottie) return;
+    if(!aviatorLottie){
+      aviatorLottie = lottie.loadAnimation({
+        container:aviatorAnimation,
+        renderer:"svg",
+        loop:true,
+        autoplay:false,
+        path:"assets/aviator/animation.json"
+      });
+    }
+    aviatorLottie.play();
+  }
+
+  function openAviator(){
+    aviatorModal.classList.remove("hidden");
+    renderAviator();
+    tickAviator();
+    ensureAviatorAnimation();
+  }
+
+  function closeAviator(event){
+    if(event && event.target !== aviatorModal) return;
+    aviatorModal.classList.add("hidden");
+    if(aviatorLottie) aviatorLottie.pause();
+  }
+
+  loadAviatorState();
+  tickAviator();
+  setInterval(tickAviator,1000);
 
   function ensureAndroidModalAnimation(){
     if(!window.lottie) return;
@@ -1543,6 +1770,7 @@
       if(androidButtonLottie) androidButtonLottie.pause();
       if(androidModalLottie) androidModalLottie.pause();
       if(activityLottie) activityLottie.pause();
+      if(aviatorLottie) aviatorLottie.pause();
       if(idLottieAnimation) idLottieAnimation.pause();
       return;
     }
@@ -1553,6 +1781,7 @@
     if(androidButtonLottie) androidButtonLottie.play();
     ensureActivityAnimation();
     if(activityLottie) activityLottie.play();
+    if(!aviatorModal.classList.contains("hidden")) ensureAviatorAnimation();
     if(!downloadModal.classList.contains("hidden")) ensureAndroidModalAnimation();
     if(!idModal.classList.contains("hidden")) ensureIdAnimation();
   });
