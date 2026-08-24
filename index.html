@@ -722,7 +722,7 @@
   }
 
   .aviator-title{margin:2px 38px 4px;color:#fff;font-size:22px}
-  .aviator-demo-badge{display:inline-block;padding:4px 9px;border-radius:999px;background:rgba(255,67,103,.12);border:1px solid rgba(255,91,116,.32);color:#ff91a6;font-size:10px;font-weight:900;letter-spacing:.08em}
+  .aviator-signal-badge{display:inline-block;padding:4px 9px;border-radius:999px;background:rgba(255,67,103,.12);border:1px solid rgba(255,91,116,.32);color:#ff91a6;font-size:10px;font-weight:900;letter-spacing:.08em}
   .aviator-animation-frame{width:100%;height:118px;margin:10px auto 6px;border-radius:19px;overflow:hidden;border:1px solid rgba(79,158,255,.28);background:rgba(2,9,20,.62);box-shadow:inset 0 0 28px rgba(44,132,255,.08)}
   .aviator-animation{width:100%;height:100%}
   .aviator-signal{margin:7px 0 2px;font-size:42px;font-weight:950;letter-spacing:-1px;color:#ff5f7d;text-shadow:0 0 22px rgba(255,70,105,.42);animation:aviatorGlow 2.2s ease-in-out infinite}
@@ -1052,17 +1052,17 @@
   <div class="aviator-modal" role="dialog" aria-modal="true" aria-labelledby="aviatorTitle">
     <button class="aviator-close" type="button" onclick="closeAviator()" aria-label="Yopish">×</button>
     <h2 id="aviatorTitle" class="aviator-title" data-i18n="aviator">Aviator</h2>
-    <span class="aviator-demo-badge" data-i18n="demoSignal">DEMO SIGNAL</span>
+    <span class="aviator-signal-badge" data-i18n="signalType">TAHLILIY SIGNAL</span>
     <div class="aviator-animation-frame">
       <div id="aviatorAnimation" class="aviator-animation" aria-hidden="true"></div>
     </div>
     <div id="aviatorSignal" class="aviator-signal">1.30x</div>
     <p id="aviatorInstruction" class="aviator-instruction">1.30x da yutuqni oling</p>
     <div class="aviator-countdown-wrap">
-      <span data-i18n="nextSignal">Keyingi demo signal</span>
+      <span data-i18n="nextSignal">Keyingi signal</span>
       <strong id="aviatorCountdown" class="aviator-countdown">06:00</strong>
     </div>
-    <p class="aviator-history-title" data-i18n="signalHistory">Oxirgi 5 demo signal</p>
+    <p class="aviator-history-title" data-i18n="signalHistory">Oxirgi 5 signal</p>
     <div id="aviatorHistory" class="aviator-history"></div>
     <p class="aviator-disclaimer" data-i18n="signalDisclaimer">Tahlil qilingan signal, natija kafolatlanmaydi</p>
   </div>
@@ -1223,7 +1223,7 @@
       rangeFive:"1 dan 5 gacha", rangeThree:"1 dan 3 gacha", language:"Tilni tanlash",
       downloadQuestion:"BetWinner APK faylini yuklab olishni davom ettirasizmi?", cancel:"Bekor qilish", continue:"Davom etish",
       estimatedActivity:"Taxminiy faollik", activeNow:"faol", aviator:"Aviator",
-      demoSignal:"DEMO SIGNAL", nextSignal:"Keyingi demo signal", signalHistory:"Oxirgi 5 demo signal",
+      signalType:"TAHLILIY SIGNAL", nextSignal:"Keyingi signal", signalHistory:"Oxirgi 5 signal",
       aviatorInstruction:x=>`${x}x da yutuqni oling`, signalDisclaimer:"Tahlil qilingan signal, natija kafolatlanmaydi"
     },
     ru:{
@@ -1241,7 +1241,7 @@
       rangeFive:"От 1 до 5", rangeThree:"От 1 до 3", language:"Выбор языка",
       downloadQuestion:"Продолжить получение BetWinner APK?", cancel:"Отмена", continue:"Продолжить",
       estimatedActivity:"Примерная активность", activeNow:"активны", aviator:"Aviator",
-      demoSignal:"ДЕМО-СИГНАЛ", nextSignal:"Следующий демо-сигнал", signalHistory:"Последние 5 демо-сигналов",
+      signalType:"АНАЛИТИЧЕСКИЙ СИГНАЛ", nextSignal:"Следующий сигнал", signalHistory:"Последние 5 сигналов",
       aviatorInstruction:x=>`Заберите выигрыш на ${x}x`, signalDisclaimer:"Аналитический сигнал, результат не гарантирован"
     },
     en:{
@@ -1259,7 +1259,7 @@
       rangeFive:"From 1 to 5", rangeThree:"From 1 to 3", language:"Select language",
       downloadQuestion:"Continue to get the BetWinner APK?", cancel:"Cancel", continue:"Continue",
       estimatedActivity:"Estimated activity", activeNow:"active", aviator:"Aviator",
-      demoSignal:"DEMO SIGNAL", nextSignal:"Next demo signal", signalHistory:"Last 5 demo signals",
+      signalType:"ANALYZED SIGNAL", nextSignal:"Next signal", signalHistory:"Last 5 signals",
       aviatorInstruction:x=>`Collect at ${x}x`, signalDisclaimer:"Analyzed signal; results are not guaranteed"
     }
   };
@@ -1397,7 +1397,7 @@
   }
 
   const AVIATOR_INTERVAL = 6*60*1000;
-  const AVIATOR_STORAGE_KEY = "sunetAviatorDemoV1";
+  const AVIATOR_STORAGE_KEY = "sunetAviatorSignalV1";
   let aviatorState = null;
 
   function generateAviatorSignal(){
