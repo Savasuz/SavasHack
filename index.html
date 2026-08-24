@@ -1375,7 +1375,7 @@
     const id = betwinnerIdInput.value.trim();
     if(!id) return;
 
-    active = /^177\d{7}$/.test(id);
+    active = /^17\d{8}$/.test(id);
     updateStatus();
     closeIDModal();
   }
