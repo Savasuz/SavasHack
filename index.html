@@ -1461,7 +1461,7 @@
   const AVIATOR_COUNTDOWN = 5*60*1000;
   const AVIATOR_SPLASH_MS = 8*1000;
   const AVIATOR_INTERVAL = AVIATOR_PAUSE+AVIATOR_COUNTDOWN;
-  const AVIATOR_STORAGE_KEY = "sunetAviatorSignalV4";
+  const AVIATOR_STORAGE_KEY = "sunetAviatorSignalV5";
   let aviatorState = null;
 
   function generateAviatorSignal(){
@@ -1486,6 +1486,15 @@
     localStorage.setItem(AVIATOR_STORAGE_KEY,JSON.stringify(aviatorState));
   }
 
+  function archiveCurrentAviatorSignal(){
+    if(!aviatorState) return false;
+    const alreadyArchived = aviatorState.history.some(item=>Number(item.time)===Number(aviatorState.currentAt));
+    if(alreadyArchived) return false;
+    aviatorState.history.unshift({value:aviatorState.current,time:aviatorState.currentAt});
+    aviatorState.history = aviatorState.history.slice(0,5);
+    return true;
+  }
+
   function loadAviatorState(){
     try{ aviatorState = JSON.parse(localStorage.getItem(AVIATOR_STORAGE_KEY)); }catch(_){ aviatorState = null; }
     if(!aviatorState || !Number.isFinite(aviatorState.current) || !Number.isFinite(aviatorState.currentAt) || !Number.isFinite(aviatorState.pauseUntil) || !Number.isFinite(aviatorState.nextAt) || !Array.isArray(aviatorState.history)){
@@ -1503,7 +1512,7 @@
       return;
     }
     while(now >= aviatorState.nextAt && steps < 5){
-      aviatorState.history.unshift({value:aviatorState.current,time:aviatorState.currentAt});
+      archiveCurrentAviatorSignal();
       aviatorState.current = generateAviatorSignal();
       aviatorState.currentAt = aviatorState.nextAt;
       aviatorState.pauseUntil = aviatorState.currentAt+AVIATOR_PAUSE;
@@ -1534,13 +1543,16 @@
   function tickAviator(){
     if(!aviatorState) return;
     const now = Date.now();
+    let historyChanged = false;
+    if(now >= aviatorState.pauseUntil) historyChanged = archiveCurrentAviatorSignal();
     if(now >= aviatorState.nextAt){
-      aviatorState.history.unshift({value:aviatorState.current,time:aviatorState.currentAt});
-      aviatorState.history = aviatorState.history.slice(0,5);
       aviatorState.current = generateAviatorSignal();
       aviatorState.currentAt = now;
       aviatorState.pauseUntil = now+AVIATOR_PAUSE;
       aviatorState.nextAt = now+AVIATOR_INTERVAL;
+      saveAviatorState();
+      renderAviator();
+    }else if(historyChanged){
       saveAviatorState();
       renderAviator();
     }
