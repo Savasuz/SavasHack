@@ -1452,7 +1452,7 @@
   const AVIATOR_COUNTDOWN = 6*60*1000;
   const AVIATOR_SPLASH_MS = 8*1000;
   const AVIATOR_INTERVAL = AVIATOR_PAUSE+AVIATOR_COUNTDOWN;
-  const AVIATOR_STORAGE_KEY = "sunetAviatorSignalV2";
+  const AVIATOR_STORAGE_KEY = "sunetAviatorSignalV3";
   let aviatorState = null;
 
   function generateAviatorSignal(){
@@ -1487,6 +1487,12 @@
 
     let steps = 0;
     const now = Date.now();
+    const stateIsStale = now-aviatorState.currentAt > AVIATOR_INTERVAL*6 || aviatorState.currentAt > now+60000 || aviatorState.nextAt > now+AVIATOR_INTERVAL+60000;
+    if(stateIsStale){
+      aviatorState = createAviatorState();
+      saveAviatorState();
+      return;
+    }
     while(now >= aviatorState.nextAt && steps < 5){
       aviatorState.history.unshift({value:aviatorState.current,time:aviatorState.currentAt});
       aviatorState.current = generateAviatorSignal();
