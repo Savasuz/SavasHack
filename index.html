@@ -1461,24 +1461,39 @@
   const AVIATOR_COUNTDOWN = 5*60*1000;
   const AVIATOR_SPLASH_MS = 8*1000;
   const AVIATOR_INTERVAL = AVIATOR_PAUSE+AVIATOR_COUNTDOWN;
-  const AVIATOR_STORAGE_KEY = "sunetAviatorSignalV5";
+  const AVIATOR_STORAGE_KEY = "sunetAviatorSignalV6";
   let aviatorState = null;
 
-  function generateAviatorSignal(){
-    return (Math.floor(Math.random()*101)+120)/100;
+  function aviatorSignalForSlot(slot){
+    let value = (Number(slot)^0x9e3779b9)>>>0;
+    value ^= value<<13;
+    value ^= value>>>17;
+    value ^= value<<5;
+    return (120+(value>>>0)%101)/100;
   }
 
-  function createAviatorState(){
-    const now = Date.now();
+  function aviatorHistoryForSlot(slot,includeCurrent){
+    const firstSlot = includeCurrent ? slot : slot-1;
+    return Array.from({length:5},(_,index)=>{
+      const historySlot = firstSlot-index;
+      return {
+        value:aviatorSignalForSlot(historySlot),
+        time:historySlot*AVIATOR_INTERVAL
+      };
+    });
+  }
+
+  function createAviatorState(now=Date.now()){
+    const slot = Math.floor(now/AVIATOR_INTERVAL);
+    const currentAt = slot*AVIATOR_INTERVAL;
+    const pauseUntil = currentAt+AVIATOR_PAUSE;
     return {
-      current:generateAviatorSignal(),
-      currentAt:now,
-      pauseUntil:now+AVIATOR_PAUSE,
-      nextAt:now+AVIATOR_INTERVAL,
-      history:Array.from({length:5},(_,index)=>({
-        value:generateAviatorSignal(),
-        time:now-(index+1)*AVIATOR_INTERVAL
-      }))
+      slot,
+      current:aviatorSignalForSlot(slot),
+      currentAt,
+      pauseUntil,
+      nextAt:currentAt+AVIATOR_INTERVAL,
+      history:aviatorHistoryForSlot(slot,now>=pauseUntil)
     };
   }
 
@@ -1486,41 +1501,8 @@
     localStorage.setItem(AVIATOR_STORAGE_KEY,JSON.stringify(aviatorState));
   }
 
-  function archiveCurrentAviatorSignal(){
-    if(!aviatorState) return false;
-    const alreadyArchived = aviatorState.history.some(item=>Number(item.time)===Number(aviatorState.currentAt));
-    if(alreadyArchived) return false;
-    aviatorState.history.unshift({value:aviatorState.current,time:aviatorState.currentAt});
-    aviatorState.history = aviatorState.history.slice(0,5);
-    return true;
-  }
-
   function loadAviatorState(){
-    try{ aviatorState = JSON.parse(localStorage.getItem(AVIATOR_STORAGE_KEY)); }catch(_){ aviatorState = null; }
-    if(!aviatorState || !Number.isFinite(aviatorState.current) || !Number.isFinite(aviatorState.currentAt) || !Number.isFinite(aviatorState.pauseUntil) || !Number.isFinite(aviatorState.nextAt) || !Array.isArray(aviatorState.history)){
-      aviatorState = createAviatorState();
-      saveAviatorState();
-      return;
-    }
-
-    let steps = 0;
-    const now = Date.now();
-    const stateIsStale = now-aviatorState.currentAt > AVIATOR_INTERVAL*6 || aviatorState.currentAt > now+60000 || aviatorState.nextAt > now+AVIATOR_INTERVAL+60000;
-    if(stateIsStale){
-      aviatorState = createAviatorState();
-      saveAviatorState();
-      return;
-    }
-    while(now >= aviatorState.nextAt && steps < 5){
-      archiveCurrentAviatorSignal();
-      aviatorState.current = generateAviatorSignal();
-      aviatorState.currentAt = aviatorState.nextAt;
-      aviatorState.pauseUntil = aviatorState.currentAt+AVIATOR_PAUSE;
-      aviatorState.nextAt += AVIATOR_INTERVAL;
-      steps++;
-    }
-    if(now >= aviatorState.nextAt) aviatorState.nextAt = now+AVIATOR_INTERVAL;
-    aviatorState.history = aviatorState.history.slice(0,5);
+    aviatorState = createAviatorState();
     saveAviatorState();
   }
 
@@ -1543,16 +1525,11 @@
   function tickAviator(){
     if(!aviatorState) return;
     const now = Date.now();
-    let historyChanged = false;
-    if(now >= aviatorState.pauseUntil) historyChanged = archiveCurrentAviatorSignal();
-    if(now >= aviatorState.nextAt){
-      aviatorState.current = generateAviatorSignal();
-      aviatorState.currentAt = now;
-      aviatorState.pauseUntil = now+AVIATOR_PAUSE;
-      aviatorState.nextAt = now+AVIATOR_INTERVAL;
-      saveAviatorState();
-      renderAviator();
-    }else if(historyChanged){
+    const slot = Math.floor(now/AVIATOR_INTERVAL);
+    const includeCurrent = now >= slot*AVIATOR_INTERVAL+AVIATOR_PAUSE;
+    const firstHistoryTime = (includeCurrent ? slot : slot-1)*AVIATOR_INTERVAL;
+    if(aviatorState.slot!==slot || Number(aviatorState.history[0]?.time)!==firstHistoryTime){
+      aviatorState = createAviatorState(now);
       saveAviatorState();
       renderAviator();
     }
