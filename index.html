@@ -1159,7 +1159,7 @@
       <div id="appleTrack" class="result-track">
         <div class="track-cell"><img src="assets/apple-medallion.webp" alt="Olma"></div><div class="track-cell"><img src="assets/apple-medallion.webp" alt="Olma"></div><div class="track-cell"><img src="assets/apple-medallion.webp" alt="Olma"></div><div class="track-cell"><img src="assets/apple-medallion.webp" alt="Olma"></div><div class="track-cell"><img src="assets/apple-medallion.webp" alt="Olma"></div>
       </div>
-      <div id="appleTip" class="tip" data-result-type="row" data-result-value="0">0 chi qatorni bosing!</div>
+      <div id="appleTip" class="tip" data-result-type="row" data-result-value="0" data-state="ready">Natijani olish uchun SCAN ni bosing</div>
       <div class="hint" data-i18n="rangeFive">1 dan 5 gacha</div>
     </div>
     <div class="bottom">
@@ -1181,7 +1181,7 @@
       <div id="kamikazeTrack" class="result-track">
         <div class="track-cell">1</div><div class="track-cell">2</div><div class="track-cell">3</div><div class="track-cell">4</div><div class="track-cell">5</div>
       </div>
-      <div id="kamikazeTip" class="tip" data-result-type="row" data-result-value="0">0 chi qatorni bosing!</div>
+      <div id="kamikazeTip" class="tip" data-result-type="row" data-result-value="0" data-state="ready">Natijani olish uchun SCAN ni bosing</div>
       <div class="hint" data-i18n="rangeFive">1 dan 5 gacha</div>
     </div>
     <div class="bottom">
@@ -1203,7 +1203,7 @@
       <div id="swampTrack" class="result-track">
         <div class="track-cell"><img src="assets/lily-pad.webp" alt="Barg"></div><div class="track-cell"><img src="assets/lily-pad.webp" alt="Barg"></div><div class="track-cell"><img src="assets/lily-pad.webp" alt="Barg"></div><div class="track-cell"><img src="assets/lily-pad.webp" alt="Barg"></div><div class="track-cell"><img src="assets/lily-pad.webp" alt="Barg"></div>
       </div>
-      <div id="swampTip" class="tip" data-result-type="row" data-result-value="0">0 chi qatorni bosing!</div>
+      <div id="swampTip" class="tip" data-result-type="row" data-result-value="0" data-state="ready">Natijani olish uchun SCAN ni bosing</div>
       <div class="hint" data-i18n="rangeFive">1 dan 5 gacha</div>
     </div>
     <div class="bottom">
@@ -1226,7 +1226,7 @@
         <div id="cup2" class="cup"><img src="assets/thimble-cup.webp" alt="2-stakan"><span>2</span></div>
         <div id="cup3" class="cup"><img src="assets/thimble-cup.webp" alt="3-stakan"><span>3</span></div>
       </div>
-      <div id="thimblesTip" class="tip" data-result-type="option" data-result-value="0">0 chi variantni bosing!</div>
+      <div id="thimblesTip" class="tip" data-result-type="option" data-result-value="0" data-state="ready">Natijani olish uchun SCAN ni bosing</div>
       <div class="hint" data-i18n="rangeThree">1 dan 3 gacha</div>
     </div>
     <div class="bottom">
@@ -1248,7 +1248,7 @@
       onlineRule:"ID muvaffaqiyatli tekshirilgandan keyin tizim Online holatiga o‘tadi.",
       activationTitle:"SUNET HACK — Faollashtirish",
       activationText:"ID’ingizni to‘g‘ri kiriting va tizimni faollashtiring.",
-      responsible:"Mas’uliyat bilan foydalaning • 18+", analyzing:"Analiz qilinmoqda...",
+      responsible:"Mas’uliyat bilan foydalaning • 18+", analyzing:"Analiz qilinmoqda...", readyToScan:"Natijani olish uchun SCAN ni bosing",
       rowResult:n=>`${n}-qatorni bosing!`, optionResult:n=>`${n}-variantni bosing!`,
       rangeFive:"1 dan 5 gacha", rangeThree:"1 dan 3 gacha", language:"Tilni tanlash",
       downloadQuestion:"BetWinner APK faylini yuklab olishni davom ettirasizmi?", cancel:"Bekor qilish", continue:"Davom etish",
@@ -1266,7 +1266,7 @@
       onlineRule:"После успешной проверки ID система перейдёт в режим Онлайн.",
       activationTitle:"SUNET HACK — Активация",
       activationText:"Введите правильный ID и активируйте систему.",
-      responsible:"Используйте ответственно • 18+", analyzing:"Идёт анализ...",
+      responsible:"Используйте ответственно • 18+", analyzing:"Идёт анализ...", readyToScan:"Нажмите СКАН, чтобы получить результат",
       rowResult:n=>`Нажмите на ${n}-й ряд!`, optionResult:n=>`Выберите ${n}-й вариант!`,
       rangeFive:"От 1 до 5", rangeThree:"От 1 до 3", language:"Выбор языка",
       downloadQuestion:"Продолжить получение BetWinner APK?", cancel:"Отмена", continue:"Продолжить",
@@ -1284,7 +1284,7 @@
       onlineRule:"After successful ID verification, the system will switch Online.",
       activationTitle:"SUNET HACK — Activation",
       activationText:"Enter your ID correctly and activate the system.",
-      responsible:"Use responsibly • 18+", analyzing:"Analyzing...",
+      responsible:"Use responsibly • 18+", analyzing:"Analyzing...", readyToScan:"Tap SCAN to get a result",
       rowResult:n=>`Tap row ${n}!`, optionResult:n=>`Choose option ${n}!`,
       rangeFive:"From 1 to 5", rangeThree:"From 1 to 3", language:"Select language",
       downloadQuestion:"Continue to get the BetWinner APK?", cancel:"Cancel", continue:"Continue",
@@ -1305,6 +1305,10 @@
 
   function refreshDynamicText(){
     document.querySelectorAll(".tip[data-result-type]").forEach(tip=>{
+      if(tip.dataset.state === "ready"){
+        tip.textContent = t("readyToScan");
+        return;
+      }
       if(tip.dataset.state === "analyzing"){
         tip.textContent = t("analyzing");
         return;
@@ -1325,10 +1329,13 @@
     document.querySelector(".settings-icon").alt = t("settings");
     document.querySelector(".telegram").setAttribute("aria-label",t("telegram"));
     document.querySelector(".telegram-icon").alt = t("telegram");
+    document.querySelector(".info-rules-btn").setAttribute("aria-label",t("rules"));
+    document.querySelector(".aviator-close").setAttribute("aria-label",t("close"));
     betwinnerIdInput.placeholder = t("enterId");
     statusEl.setAttribute("aria-label",active ? t("online") : t("offline"));
     refreshDynamicText();
     renderAviator();
+    if(aviatorState) tickAviator();
   }
 
   function setLanguage(language){
@@ -1731,7 +1738,9 @@
   }
 
   const statusEl = document.getElementById("status");
-  let active = false;
+  const BETWINNER_ID_KEY = "sunetBetwinnerId";
+  const savedBetwinnerId = localStorage.getItem(BETWINNER_ID_KEY) || "";
+  let active = /^17\d{8}$/.test(savedBetwinnerId);
   let statusAnimation = null;
   let lastStatusState = null;
 
@@ -1747,7 +1756,7 @@
   }
 
   function setID(){
-    betwinnerIdInput.value = "";
+    betwinnerIdInput.value = localStorage.getItem(BETWINNER_ID_KEY) || "";
     idModal.classList.remove("hidden");
     ensureIdAnimation();
     setTimeout(()=>betwinnerIdInput.focus(),80);
@@ -1764,6 +1773,8 @@
     if(!id) return;
 
     active = /^17\d{8}$/.test(id);
+    if(active) localStorage.setItem(BETWINNER_ID_KEY,id);
+    else localStorage.removeItem(BETWINNER_ID_KEY);
     updateStatus();
     closeIDModal();
   }
@@ -1837,9 +1848,9 @@
   function resetNum(numId, tipId, trackId){
     document.getElementById(numId).innerText = 0;
     const tip = document.getElementById(tipId);
-    tip.dataset.state = "result";
+    tip.dataset.state = "ready";
     tip.dataset.resultValue = 0;
-    tip.innerText = t("rowResult",0);
+    tip.innerText = t("readyToScan");
     if(trackId) document.querySelectorAll("#"+trackId+" .track-cell").forEach(cell=>cell.classList.remove("selected"));
   }
 
@@ -1867,9 +1878,9 @@
   function resetThimbles(){
     ["cup1","cup2","cup3"].forEach(id=>document.getElementById(id).classList.remove("active"));
     const tip = document.getElementById("thimblesTip");
-    tip.dataset.state = "result";
+    tip.dataset.state = "ready";
     tip.dataset.resultValue = 0;
-    tip.innerText = t("optionResult",0);
+    tip.innerText = t("readyToScan");
   }
 
   applyLanguage();
