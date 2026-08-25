@@ -1,3 +1,24 @@
+1163:      <div class="num-display"><div id="appleScanAnimation" class="game-scan-animation" aria-hidden="true"></div><div id="appleNum" class="num hidden">0</div></div>
+1185:      <div class="num-display"><div id="kamikazeScanAnimation" class="game-scan-animation" aria-hidden="true"></div><div id="kamikazeNum" class="num hidden">0</div></div>
+1207:      <div class="num-display"><div id="swampScanAnimation" class="game-scan-animation" aria-hidden="true"></div><div id="swampNum" class="num hidden">0</div></div>
+1229:      <div id="thimblesScanAnimation" class="game-scan-animation" aria-hidden="true"></div>
+1838:  const gameScanAnimations = {};
+1839:  function ensureGameScanAnimations(){
+1842:      if(gameScanAnimations[game]) return;
+1843:      const container = document.getElementById(game+"ScanAnimation");
+1845:      gameScanAnimations[game] = lottie.loadAnimation({
+1851:        path:"assets/scanning.json?v=1"
+1856:  function setGameScanReady(game,ready){
+1857:    const animationEl = document.getElementById(game+"ScanAnimation");
+1859:    const animation = gameScanAnimations[game];
+1870:    setGameScanReady(game,false);
+1894:    setGameScanReady(numId.replace("Num",""),true);
+1906:    setGameScanReady("thimbles",false);
+1926:    setGameScanReady("thimbles",true);
+1934:  ensureGameScanAnimations();
+2001:      Object.values(gameScanAnimations).forEach(animation=>animation.pause());
+2015:    Object.entries(gameScanAnimations).forEach(([game,animation])=>{
+2016:      const container = document.getElementById(game+"ScanAnimation");
 <!DOCTYPE html>
 <html lang="uz">
 <head>
@@ -552,6 +573,11 @@
     align-items:center;
     justify-content:center;
   }
+
+  .num-display{min-height:128px;display:flex;align-items:center;justify-content:center}
+  .game-scan-animation{width:126px;height:126px;display:flex;align-items:center;justify-content:center;filter:drop-shadow(0 0 16px rgba(51,214,255,.25))}
+  .game-scan-animation svg{width:100%!important;height:100%!important}
+  .thimbles-game .game-scan-animation{width:92px;height:92px;margin-bottom:-8px}
 
   .tip{
     min-height:28px;
@@ -1155,7 +1181,7 @@
     </div>
     <div class="game-title">APPLE</div>
     <div class="num-zone">
-      <div id="appleNum" class="num">0</div>
+      <div class="num-display"><div id="appleScanAnimation" class="game-scan-animation" aria-hidden="true"></div><div id="appleNum" class="num hidden">0</div></div>
       <div id="appleTrack" class="result-track">
         <div class="track-cell"><img src="assets/apple-medallion.webp" alt="Olma"></div><div class="track-cell"><img src="assets/apple-medallion.webp" alt="Olma"></div><div class="track-cell"><img src="assets/apple-medallion.webp" alt="Olma"></div><div class="track-cell"><img src="assets/apple-medallion.webp" alt="Olma"></div><div class="track-cell"><img src="assets/apple-medallion.webp" alt="Olma"></div>
       </div>
@@ -1177,7 +1203,7 @@
     </div>
     <div class="game-title">KAMIKAZE</div>
     <div class="num-zone">
-      <div id="kamikazeNum" class="num">0</div>
+      <div class="num-display"><div id="kamikazeScanAnimation" class="game-scan-animation" aria-hidden="true"></div><div id="kamikazeNum" class="num hidden">0</div></div>
       <div id="kamikazeTrack" class="result-track">
         <div class="track-cell">1</div><div class="track-cell">2</div><div class="track-cell">3</div><div class="track-cell">4</div><div class="track-cell">5</div>
       </div>
@@ -1199,7 +1225,7 @@
     </div>
     <div class="game-title">SWAMP LAND</div>
     <div class="num-zone">
-      <div id="swampNum" class="num">0</div>
+      <div class="num-display"><div id="swampScanAnimation" class="game-scan-animation" aria-hidden="true"></div><div id="swampNum" class="num hidden">0</div></div>
       <div id="swampTrack" class="result-track">
         <div class="track-cell"><img src="assets/lily-pad.webp" alt="Barg"></div><div class="track-cell"><img src="assets/lily-pad.webp" alt="Barg"></div><div class="track-cell"><img src="assets/lily-pad.webp" alt="Barg"></div><div class="track-cell"><img src="assets/lily-pad.webp" alt="Barg"></div><div class="track-cell"><img src="assets/lily-pad.webp" alt="Barg"></div>
       </div>
@@ -1221,6 +1247,7 @@
     </div>
     <div class="game-title">THIMBLES</div>
     <div class="num-zone">
+      <div id="thimblesScanAnimation" class="game-scan-animation" aria-hidden="true"></div>
       <div class="cups">
         <div id="cup1" class="cup"><img src="assets/thimble-cup.webp" alt="1-stakan"><span>1</span></div>
         <div id="cup2" class="cup"><img src="assets/thimble-cup.webp" alt="2-stakan"><span>2</span></div>
@@ -1829,9 +1856,40 @@
     cells.forEach((cell,index)=>cell.classList.toggle("selected",index===val-1));
   }
 
+  const gameScanAnimations = {};
+  function ensureGameScanAnimations(){
+    if(!window.lottie) return;
+    ["apple","kamikaze","swamp","thimbles"].forEach(game=>{
+      if(gameScanAnimations[game]) return;
+      const container = document.getElementById(game+"ScanAnimation");
+      if(!container) return;
+      gameScanAnimations[game] = lottie.loadAnimation({
+        container,
+        renderer:"svg",
+        rendererSettings:{preserveAspectRatio:"xMidYMid meet"},
+        loop:true,
+        autoplay:true,
+        path:"assets/scanning.json?v=1"
+      });
+    });
+  }
+
+  function setGameScanReady(game,ready){
+    const animationEl = document.getElementById(game+"ScanAnimation");
+    if(animationEl) animationEl.classList.toggle("hidden",!ready);
+    const animation = gameScanAnimations[game];
+    if(animation){
+      if(ready) animation.play();
+      else animation.pause();
+    }
+  }
+
   function spinNum(numId, tipId, max, trackId){
     let i = 0;
     const el = document.getElementById(numId);
+    const game = numId.replace("Num","");
+    setGameScanReady(game,false);
+    el.classList.remove("hidden");
     const tip = document.getElementById(tipId);
     tip.dataset.state = "analyzing";
     tip.innerText = t("analyzing");
@@ -1851,7 +1909,10 @@
   }
 
   function resetNum(numId, tipId, trackId){
-    document.getElementById(numId).innerText = 0;
+    const numberEl = document.getElementById(numId);
+    numberEl.innerText = 0;
+    numberEl.classList.add("hidden");
+    setGameScanReady(numId.replace("Num",""),true);
     const tip = document.getElementById(tipId);
     tip.dataset.state = "ready";
     tip.dataset.resultValue = 0;
@@ -1863,6 +1924,7 @@
     let i = 0;
     const tip = document.getElementById("thimblesTip");
     const cups = [document.getElementById("cup1"), document.getElementById("cup2"), document.getElementById("cup3")];
+    setGameScanReady("thimbles",false);
     tip.dataset.state = "analyzing";
     tip.innerText = t("analyzing");
 
@@ -1882,6 +1944,7 @@
 
   function resetThimbles(){
     ["cup1","cup2","cup3"].forEach(id=>document.getElementById(id).classList.remove("active"));
+    setGameScanReady("thimbles",true);
     const tip = document.getElementById("thimblesTip");
     tip.dataset.state = "ready";
     tip.dataset.resultValue = 0;
@@ -1889,6 +1952,7 @@
   }
 
   applyLanguage();
+  ensureGameScanAnimations();
   ensureAndroidButtonAnimation();
   ensureActivityAnimation();
   ensureAviatorButtonAnimation();
@@ -1955,6 +2019,7 @@
       if(aviatorButtonLottie) aviatorButtonLottie.pause();
       if(infoRulesLottie) infoRulesLottie.pause();
       if(idLottieAnimation) idLottieAnimation.pause();
+      Object.values(gameScanAnimations).forEach(animation=>animation.pause());
       return;
     }
 
@@ -1968,6 +2033,10 @@
     if(aviatorButtonLottie) aviatorButtonLottie.play();
     ensureInfoRulesAnimation();
     if(infoRulesLottie) infoRulesLottie.play();
+    Object.entries(gameScanAnimations).forEach(([game,animation])=>{
+      const container = document.getElementById(game+"ScanAnimation");
+      if(container && !container.classList.contains("hidden")) animation.play();
+    });
     if(!aviatorModal.classList.contains("hidden")) ensureAviatorAnimation();
     if(!downloadModal.classList.contains("hidden")) ensureAndroidModalAnimation();
     if(!idModal.classList.contains("hidden")) ensureIdAnimation();
