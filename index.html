@@ -1544,6 +1544,10 @@
     }
     const isPause = now < aviatorState.pauseUntil;
     const showWaiting = !isPause;
+    if(isPause){
+      const liveSignalTime = new Date(now).toLocaleTimeString(aviatorLocale(),{hour:"2-digit",minute:"2-digit"});
+      aviatorInstruction.textContent = t("aviatorInstruction",liveSignalTime,aviatorState.current.toFixed(2));
+    }
     const waitingElapsed = Math.max(0,now-aviatorState.pauseUntil);
     const waitingRemaining = Math.max(0,aviatorState.nextAt-now);
     const showSplash = showWaiting && (waitingElapsed < AVIATOR_SPLASH_MS || waitingRemaining <= AVIATOR_SPLASH_MS);
