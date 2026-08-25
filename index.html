@@ -1551,6 +1551,7 @@
     aviatorSignal.style.display = showWaiting ? "none" : "flex";
     aviatorAnimation.style.display = showWaiting ? "none" : "block";
     aviatorInstruction.style.visibility = showWaiting ? "hidden" : "visible";
+    const splashWasActive = aviatorSplashAnimation.classList.contains("active");
     aviatorLoadingBlocks.classList.toggle("active",showBlocks);
     aviatorSplashAnimation.classList.toggle("active",showSplash);
     if(aviatorLoadingBlocksLottie){
@@ -1558,8 +1559,8 @@
       else aviatorLoadingBlocksLottie.pause();
     }
     if(aviatorSplashLottie){
-      if(showSplash) aviatorSplashLottie.play();
-      else aviatorSplashLottie.pause();
+      if(showSplash && !splashWasActive) aviatorSplashLottie.goToAndPlay(0,true);
+      else if(!showSplash && splashWasActive) aviatorSplashLottie.goToAndStop(0,true);
     }
     const remaining = Math.max(0,(isPause ? aviatorState.pauseUntil : aviatorState.nextAt)-now);
     aviatorCountdownLabel.textContent = isPause ? t("signalPause") : t("nextSignal");
@@ -1604,7 +1605,7 @@
         container:aviatorSplashAnimation,
         renderer:"svg",
         rendererSettings:{preserveAspectRatio:"xMidYMid meet"},
-        loop:true,
+        loop:false,
         autoplay:false,
         path:"assets/aviator/splash.json?v=1"
       });
