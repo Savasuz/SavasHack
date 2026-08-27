@@ -384,6 +384,28 @@
     text-align:center;
   }
 
+  .game-title-logo-wrap{
+    width:100%;
+    min-height:68px;
+    margin-top:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+
+  .game-title-logo{
+    display:block;
+    width:auto;
+    height:auto;
+    max-width:88%;
+    max-height:68px;
+    object-fit:contain;
+    filter:drop-shadow(0 0 10px rgba(51,214,255,.12));
+  }
+
+  .game-title-logo-kamikaze{max-width:82%;max-height:64px;filter:drop-shadow(0 0 12px rgba(255,48,48,.2))}
+  .game-title-logo-thimbles{max-width:84%;max-height:68px}
+
   .game-badge{
     width:76px;
     height:76px;
@@ -1177,7 +1199,7 @@
       <button class="mini-btn" onclick="goBack()" data-i18n="back">Orqaga</button>
       <button class="mini-btn" onclick="resetNum('kamikazeNum','kamikazeTip','kamikazeTrack')" data-i18n="restart">Restart</button>
     </div>
-    <div class="game-title">KAMIKAZE</div>
+    <div class="game-title game-title-logo-wrap"><img class="game-title-logo game-title-logo-kamikaze" src="assets/kamikaze-title.png?v=1" alt="Kamikaze"></div>
     <div class="num-zone">
       <div class="num-display"><div id="kamikazeNum" class="num">0</div></div>
       <div id="kamikazeTrack" class="result-track">
@@ -1221,7 +1243,7 @@
       <button class="mini-btn" onclick="goBack()" data-i18n="back">Orqaga</button>
       <button class="mini-btn" onclick="resetThimbles()" data-i18n="restart">Restart</button>
     </div>
-    <div class="game-title">THIMBLES</div>
+    <div class="game-title game-title-logo-wrap"><img class="game-title-logo game-title-logo-thimbles" src="assets/thimbles-title.png?v=1" alt="Thimbles"></div>
     <div class="num-zone">
       <div class="cups">
         <div id="cup1" class="cup"><img src="assets/thimble-cup.webp" alt="1-stakan"><span>1</span></div>
