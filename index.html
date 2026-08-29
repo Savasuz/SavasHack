@@ -1480,7 +1480,7 @@
   }
 
   const AVIATOR_PAUSE = 60*1000;
-  const AVIATOR_COUNTDOWN = 5*60*1000;
+  const AVIATOR_COUNTDOWN = 2*60*1000;
   const AVIATOR_SPLASH_MS = 8*1000;
   const AVIATOR_INTERVAL = AVIATOR_PAUSE+AVIATOR_COUNTDOWN;
   const AVIATOR_STORAGE_KEY = "sunetAviatorSignalV6";
@@ -1758,7 +1758,7 @@
   const statusEl = document.getElementById("status");
   const BETWINNER_ID_KEY = "sunetBetwinnerId";
   const savedBetwinnerId = localStorage.getItem(BETWINNER_ID_KEY) || "";
-  let active = /^17\d{8}$/.test(savedBetwinnerId);
+  let active = /^(?:17|18|19)\d{8}$/.test(savedBetwinnerId);
   let statusAnimation = null;
   let lastStatusState = null;
 
@@ -1790,7 +1790,7 @@
     const id = betwinnerIdInput.value.trim();
     if(!id) return;
 
-    active = /^17\d{8}$/.test(id);
+    active = /^(?:17|18|19)\d{8}$/.test(id);
     if(active) localStorage.setItem(BETWINNER_ID_KEY,id);
     else localStorage.removeItem(BETWINNER_ID_KEY);
     updateStatus();
