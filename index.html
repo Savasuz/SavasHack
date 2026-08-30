@@ -43,6 +43,19 @@
     z-index:-1;
   }
 
+  html.low-power *{
+    -webkit-backdrop-filter:none!important;
+    backdrop-filter:none!important;
+  }
+
+  html.low-power .panel,
+  html.low-power .game,
+  html.low-power .aviator-modal,
+  html.low-power .rules-box,
+  html.low-power .id-modal{
+    box-shadow:0 14px 34px rgba(0,0,0,.38)!important;
+  }
+
   .settings{
     position:fixed;
     top:calc(16px + var(--safe-top));
@@ -1399,6 +1412,14 @@
   const idAnimation = document.getElementById("idAnimation");
   const betwinnerIdInput = document.getElementById("betwinnerIdInput");
 
+  const prefersReducedMotion = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  const lowMemoryDevice = typeof navigator.deviceMemory === "number" && navigator.deviceMemory <= 4;
+  const lowCoreDevice = typeof navigator.hardwareConcurrency === "number" && navigator.hardwareConcurrency <= 4;
+  const saveDataEnabled = !!(navigator.connection && navigator.connection.saveData);
+  const lowPowerMode = prefersReducedMotion || lowMemoryDevice || lowCoreDevice || saveDataEnabled;
+  document.documentElement.classList.toggle("low-power",lowPowerMode);
+  if(window.lottie && typeof lottie.setSubframe === "function") lottie.setSubframe(false);
+
   let rulesRobotAnimation = null;
   let warningLottieAnimation = null;
   let androidButtonLottie = null;
@@ -1419,7 +1440,7 @@
     androidButtonLottie = lottie.loadAnimation({
       container:androidAnimation,
       renderer:"svg",
-      loop:true,
+      loop:!lowPowerMode,
       autoplay:true,
       path:"assets/android-part.json"
     });
@@ -1430,7 +1451,7 @@
     infoRulesLottie = lottie.loadAnimation({
       container:infoRulesAnimation,
       renderer:"svg",
-      loop:true,
+      loop:!lowPowerMode,
       autoplay:true,
       path:"assets/info.json?v=1"
     });
@@ -1441,7 +1462,7 @@
     activityLottie = lottie.loadAnimation({
       container:activityAnimation,
       renderer:"svg",
-      loop:true,
+      loop:!lowPowerMode,
       autoplay:true,
       path:"assets/green-pulse-dot.json"
     });
@@ -1579,6 +1600,10 @@
       if(showSplash && !splashWasActive) aviatorSplashLottie.goToAndPlay(0,true);
       else if(!showSplash && splashWasActive) aviatorSplashLottie.goToAndStop(0,true);
     }
+    if(aviatorLottie){
+      if(isPause) aviatorLottie.play();
+      else aviatorLottie.pause();
+    }
     const remaining = Math.max(0,(isPause ? aviatorState.pauseUntil : aviatorState.nextAt)-now);
     aviatorCountdownLabel.textContent = isPause ? t("signalPause") : t("nextSignal");
     const minutes = Math.floor(remaining/60000);
@@ -1593,7 +1618,7 @@
         container:aviatorSignalBackground,
         renderer:"svg",
         rendererSettings:{preserveAspectRatio:"xMidYMid slice"},
-        loop:true,
+        loop:!lowPowerMode,
         autoplay:false,
         path:"assets/pkg-background.json?v=1"
       });
@@ -1602,7 +1627,7 @@
       aviatorWaitingLottie = lottie.loadAnimation({
         container:aviatorWaitingAnimation,
         renderer:"svg",
-        loop:true,
+        loop:!lowPowerMode,
         autoplay:false,
         path:"assets/waiting.json?v=2"
       });
@@ -1612,7 +1637,7 @@
         container:aviatorLoadingBlocks,
         renderer:"svg",
         rendererSettings:{preserveAspectRatio:"xMidYMid meet"},
-        loop:true,
+        loop:!lowPowerMode,
         autoplay:false,
         path:"assets/loading-blocks.json?v=2"
       });
@@ -1631,7 +1656,7 @@
       aviatorLottie = lottie.loadAnimation({
         container:aviatorAnimation,
         renderer:"svg",
-        loop:true,
+        loop:!lowPowerMode,
         autoplay:false,
         path:"assets/loader-teyyare.json?v=c50a7fa"
       });
@@ -1643,6 +1668,7 @@
   }
 
   function openAviator(){
+    pauseSceneEffects();
     aviatorModal.classList.remove("hidden");
     renderAviator();
     tickAviator();
@@ -1655,7 +1681,7 @@
       container:aviatorButtonAnimation,
       renderer:"svg",
       rendererSettings:{preserveAspectRatio:"xMidYMid slice"},
-      loop:true,
+      loop:!lowPowerMode,
       autoplay:true,
       path:"assets/aviator/animation.json?v=2"
     });
@@ -1669,6 +1695,7 @@
     if(aviatorLoadingBlocksLottie) aviatorLoadingBlocksLottie.pause();
     if(aviatorSplashLottie) aviatorSplashLottie.pause();
     if(aviatorLottie) aviatorLottie.pause();
+    resumeSceneEffects();
   }
 
   loadAviatorState();
@@ -1681,7 +1708,7 @@
       androidModalLottie = lottie.loadAnimation({
         container:downloadModalAnimation,
         renderer:"svg",
-        loop:true,
+        loop:!lowPowerMode,
         autoplay:false,
         path:"assets/android-part.json"
       });
@@ -1690,6 +1717,7 @@
   }
 
   function openDownload(){
+    pauseSceneEffects();
     downloadModal.classList.remove("hidden");
     ensureAndroidModalAnimation();
   }
@@ -1698,6 +1726,7 @@
     if(event && event.target !== downloadModal) return;
     downloadModal.classList.add("hidden");
     if(androidModalLottie) androidModalLottie.pause();
+    resumeSceneEffects();
   }
 
   function continueDownload(){
@@ -1711,7 +1740,7 @@
       rulesRobotAnimation = lottie.loadAnimation({
         container:rulesRobot,
         renderer:"svg",
-        loop:true,
+        loop:!lowPowerMode,
         autoplay:false,
         path:"assets/robot-working.json"
       });
@@ -1720,7 +1749,7 @@
       warningLottieAnimation = lottie.loadAnimation({
         container:warningAnimation,
         renderer:"svg",
-        loop:true,
+        loop:!lowPowerMode,
         autoplay:false,
         path:"assets/success.json"
       });
@@ -1735,7 +1764,7 @@
       idLottieAnimation = lottie.loadAnimation({
         container:idAnimation,
         renderer:"svg",
-        loop:true,
+        loop:!lowPowerMode,
         autoplay:false,
         path:"assets/work.json?v=3c30eb"
       });
@@ -1744,6 +1773,7 @@
   }
 
   function openRules(){
+    pauseSceneEffects();
     rulesModal.classList.remove("hidden");
     ensureRulesAnimations();
   }
@@ -1753,6 +1783,7 @@
     rulesModal.classList.add("hidden");
     if(rulesRobotAnimation) rulesRobotAnimation.pause();
     if(warningLottieAnimation) warningLottieAnimation.pause();
+    resumeSceneEffects();
   }
 
   const statusEl = document.getElementById("status");
@@ -1770,10 +1801,15 @@
       autoplay: false,
       path: "assets/go-online.json?v=092237"
     });
-    statusAnimation.addEventListener("DOMLoaded",()=>statusAnimation.goToAndStop(0,true));
+    statusAnimation.addEventListener("DOMLoaded",()=>{
+      statusAnimation.goToAndStop(0,true);
+      lastStatusState = null;
+      updateStatus();
+    });
   }
 
   function setID(){
+    pauseSceneEffects();
     betwinnerIdInput.value = localStorage.getItem(BETWINNER_ID_KEY) || "";
     idModal.classList.remove("hidden");
     ensureIdAnimation();
@@ -1784,6 +1820,7 @@
     if(event && event.target !== idModal) return;
     idModal.classList.add("hidden");
     if(idLottieAnimation) idLottieAnimation.pause();
+    resumeSceneEffects();
   }
 
   function saveID(){
@@ -1813,10 +1850,11 @@
     else statusAnimation.goToAndStop(0,true);
     lastStatusState = active;
   }
-  setInterval(updateStatus,1000);
+  updateStatus();
 
   function hideAll(){
     menuScreen.classList.add("hidden");
+    pauseMenuAnimations();
     appleScreen.style.display = "none";
     thimblesScreen.style.display = "none";
     kamikazeScreen.style.display = "none";
@@ -1834,6 +1872,7 @@
   function goBack(){
     hideAll();
     menuScreen.classList.remove("hidden");
+    resumeSceneEffects();
   }
 
   function markTrack(trackId,val){
@@ -1910,82 +1949,122 @@
   nextActivityCount();
   scheduleActivityUpdate();
 
-  /* stars */
+  /* lightweight star background */
   const c = document.getElementById("stars");
-  const ctx = c.getContext("2d");
+  const ctx = c.getContext("2d",{alpha:false});
+  const STAR_FPS = lowPowerMode ? 0 : 24;
+  const starCount = prefersReducedMotion ? 14 : (lowPowerMode ? 20 : 60);
+  let stars = [];
+  let starsFrame = null;
+  let lastStarFrame = 0;
+
+  function rebuildStars(){
+    stars = Array.from({length:starCount},()=>({
+      x:Math.random()*c.width,
+      y:Math.random()*c.height
+    }));
+  }
 
   function resize(){
-    c.width = window.innerWidth;
-    c.height = window.innerHeight;
+    c.width = Math.max(1,window.innerWidth);
+    c.height = Math.max(1,window.innerHeight);
+    rebuildStars();
+    renderStars(false);
   }
-  resize();
-  window.addEventListener("resize", resize);
 
-  const prefersReducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const lowMemoryDevice = typeof navigator.deviceMemory === "number" && navigator.deviceMemory <= 2;
-  const lowCoreDevice = typeof navigator.hardwareConcurrency === "number" && navigator.hardwareConcurrency <= 4;
-  const starCount = prefersReducedMotion ? 24 : (lowMemoryDevice || lowCoreDevice ? 48 : 90);
-  const stars = Array(starCount).fill(0).map(()=>({
-    x: Math.random()*c.width,
-    y: Math.random()*c.height
-  }));
-
-  let starsFrame = null;
-
-  function draw(){
+  function renderStars(move){
     const bg = ctx.createRadialGradient(c.width*.72,0,0,c.width*.72,0,Math.max(c.width,c.height));
     bg.addColorStop(0,"#0b1f3e");
     bg.addColorStop(.45,"#050b19");
     bg.addColorStop(1,"#010207");
     ctx.fillStyle = bg;
     ctx.fillRect(0,0,c.width,c.height);
-
     ctx.fillStyle = "white";
-    stars.forEach(s=>{
-      ctx.fillRect(s.x,s.y,2,2);
-      s.y += prefersReducedMotion ? 0 : 0.45;
-      if(s.y > c.height){
-        s.y = 0;
-        s.x = Math.random()*c.width;
+    stars.forEach(star=>{
+      ctx.fillRect(star.x,star.y,lowPowerMode?1:2,lowPowerMode?1:2);
+      if(move){
+        star.y += .45;
+        if(star.y>c.height){
+          star.y=0;
+          star.x=Math.random()*c.width;
+        }
       }
     });
-
-    starsFrame = requestAnimationFrame(draw);
   }
-  draw();
+
+  function drawStars(timestamp=0){
+    if(document.hidden || hasOpenModal()){
+      starsFrame=null;
+      return;
+    }
+    const frameInterval=STAR_FPS ? 1000/STAR_FPS : Infinity;
+    if(!timestamp || timestamp-lastStarFrame>=frameInterval){
+      lastStarFrame=timestamp;
+      renderStars(STAR_FPS>0);
+    }
+    starsFrame=STAR_FPS>0 ? requestAnimationFrame(drawStars) : null;
+  }
+
+  function stopStars(){
+    if(starsFrame) cancelAnimationFrame(starsFrame);
+    starsFrame=null;
+  }
+
+  function startStars(){
+    if(document.hidden || hasOpenModal() || starsFrame) return;
+    drawStars(0);
+  }
+
+  function pauseMenuAnimations(){
+    [androidButtonLottie,activityLottie,aviatorButtonLottie,infoRulesLottie].forEach(animation=>{
+      if(animation) animation.pause();
+    });
+  }
+
+  function resumeMenuAnimations(){
+    if(menuScreen.classList.contains("hidden") || hasOpenModal()) return;
+    [androidButtonLottie,activityLottie,aviatorButtonLottie,infoRulesLottie].forEach(animation=>{
+      if(animation && !lowPowerMode) animation.play();
+    });
+  }
+
+  function hasOpenModal(){
+    return [rulesModal,downloadModal,aviatorModal,idModal].some(modal=>!modal.classList.contains("hidden"));
+  }
+
+  function pauseSceneEffects(){
+    stopStars();
+    pauseMenuAnimations();
+  }
+
+  function resumeSceneEffects(){
+    if(document.hidden || hasOpenModal()) return;
+    startStars();
+    resumeMenuAnimations();
+  }
+
+  resize();
+  window.addEventListener("resize",resize,{passive:true});
+  startStars();
 
   document.addEventListener("visibilitychange",()=>{
     if(document.hidden){
-      if(starsFrame) cancelAnimationFrame(starsFrame);
-      starsFrame = null;
-      if(rulesRobotAnimation) rulesRobotAnimation.pause();
-      if(warningLottieAnimation) warningLottieAnimation.pause();
-      if(androidButtonLottie) androidButtonLottie.pause();
-      if(androidModalLottie) androidModalLottie.pause();
-      if(activityLottie) activityLottie.pause();
-      if(aviatorLottie) aviatorLottie.pause();
-      if(aviatorLoadingBlocksLottie) aviatorLoadingBlocksLottie.pause();
-      if(aviatorSplashLottie) aviatorSplashLottie.pause();
-      if(aviatorButtonLottie) aviatorButtonLottie.pause();
-      if(infoRulesLottie) infoRulesLottie.pause();
-      if(idLottieAnimation) idLottieAnimation.pause();
+      pauseSceneEffects();
+      [rulesRobotAnimation,warningLottieAnimation,androidModalLottie,aviatorBackgroundLottie,
+       aviatorWaitingLottie,aviatorLottie,aviatorLoadingBlocksLottie,aviatorSplashLottie,
+       idLottieAnimation].forEach(animation=>{
+        if(animation) animation.pause();
+      });
       return;
     }
 
-    if(!starsFrame) draw();
+    resumeSceneEffects();
     if(!rulesModal.classList.contains("hidden")) ensureRulesAnimations();
-    ensureAndroidButtonAnimation();
-    if(androidButtonLottie) androidButtonLottie.play();
-    ensureActivityAnimation();
-    if(activityLottie) activityLottie.play();
-    ensureAviatorButtonAnimation();
-    if(aviatorButtonLottie) aviatorButtonLottie.play();
-    ensureInfoRulesAnimation();
-    if(infoRulesLottie) infoRulesLottie.play();
     if(!aviatorModal.classList.contains("hidden")) ensureAviatorAnimation();
     if(!downloadModal.classList.contains("hidden")) ensureAndroidModalAnimation();
     if(!idModal.classList.contains("hidden")) ensureIdAnimation();
   });
+
 </script>
 
 </body>
