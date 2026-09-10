@@ -1559,6 +1559,16 @@
     const value = Number(current && current.value);
     if(!Number.isFinite(publishedAt) || !Number.isFinite(value) || value < 1) return false;
     const now = Date.now();
+    if(now >= publishedAt + AVIATOR_INTERVAL){
+      if(aviatorRemoteActive && Number(aviatorState?.currentAt) === publishedAt){
+        aviatorRemoteActive = false;
+        aviatorRemoteData = null;
+        aviatorState = createAviatorState(now);
+        saveAviatorState();
+        renderAviator();
+      }
+      return false;
+    }
     const pauseUntil = publishedAt + AVIATOR_PAUSE;
     const history = Object.values(data.history || {}).map(item=>({
       value:Number(item && item.value),
@@ -1619,6 +1629,13 @@
   function tickAviator(){
     if(!aviatorState) return;
     const now = Date.now();
+    if(aviatorRemoteActive && now >= aviatorState.nextAt){
+      aviatorRemoteActive = false;
+      aviatorRemoteData = null;
+      aviatorState = createAviatorState(now);
+      saveAviatorState();
+      renderAviator();
+    }
     if(!aviatorRemoteActive){
       const slot = Math.floor(now/AVIATOR_INTERVAL);
       const includeCurrent = now >= slot*AVIATOR_INTERVAL+AVIATOR_PAUSE;
