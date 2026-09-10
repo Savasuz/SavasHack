@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#030712">
+<title>SUNETUZ — Aviator Admin</title>
+<style>
+:root{color-scheme:dark;--cyan:#35d8ff;--violet:#655cff;--green:#39e89b;--red:#ff5572}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{min-height:100%;margin:0;font-family:Arial,sans-serif;background:#030712;color:#f5f8ff}
+body{display:grid;place-items:center;padding:24px;background:radial-gradient(circle at 50% 8%,#14254b 0,transparent 42%),#030712}
+.card{width:min(100%,420px);padding:24px;border:1px solid rgba(78,160,255,.32);border-radius:28px;background:linear-gradient(145deg,rgba(12,29,54,.96),rgba(4,10,23,.96));box-shadow:0 28px 70px rgba(0,0,0,.52),0 0 40px rgba(42,116,255,.12)}
+h1{margin:0 0 7px;font-size:27px;text-align:center;background:linear-gradient(90deg,#fff,#71dcff);-webkit-background-clip:text;color:transparent}
+.sub{text-align:center;color:#aebed4;margin:0 0 22px}
+label{display:block;margin:15px 2px 7px;color:#c8d6e9;font-weight:700}
+input{width:100%;border:1px solid rgba(92,173,255,.28);border-radius:17px;padding:15px 14px;background:#050e1d;color:#fff;font-size:18px;text-align:center;outline:0}
+input:focus{border-color:var(--cyan);box-shadow:0 0 0 4px rgba(53,216,255,.09)}
+button{width:100%;border:0;border-radius:20px;padding:15px;margin-top:16px;color:white;font-size:17px;font-weight:800;background:linear-gradient(90deg,var(--cyan),var(--violet));cursor:pointer}
+button:disabled{opacity:.55;cursor:wait}.hidden{display:none!important}
+.status{min-height:22px;margin:14px 0 0;text-align:center;color:#aebed4}.status.ok{color:var(--green)}.status.err{color:var(--red)}
+.current{margin-top:18px;padding:15px;border:1px solid rgba(92,173,255,.22);border-radius:18px;background:rgba(2,9,20,.66);text-align:center}
+.current strong{display:block;font-size:32px;color:#8be6ff;margin:5px 0}.meta{font-size:13px;color:#91a4bf}
+.row{display:flex;gap:10px}.row button:last-child{width:auto;padding-inline:18px;background:#142139}
+</style>
+</head>
+<body>
+<main class="card">
+  <h1>AVIATOR ADMIN</h1>
+  <p class="sub">Umumiy signal boshqaruvi</p>
+  <section id="loginBox">
+    <label for="password">Maxsus parol</label>
+    <input id="password" type="password" autocomplete="current-password" placeholder="Parolni kiriting">
+    <button id="loginBtn" type="button">Kirish</button>
+    <p id="loginStatus" class="status"></p>
+  </section>
+  <section id="adminBox" class="hidden">
+    <div class="current">
+      <span>Hozirgi umumiy signal</span>
+      <strong id="currentValue">—</strong>
+      <span id="currentTime" class="meta">Signal hali yuborilmagan</span>
+    </div>
+    <label for="coefficient">Yangi koeffitsient</label>
+    <input id="coefficient" type="number" inputmode="decimal" min="1.01" max="100" step="0.01" placeholder="Masalan: 1.85">
+    <button id="publishBtn" type="button">Hammaga signal yuborish</button>
+    <div class="row"><button id="logoutBtn" type="button">Chiqish</button></div>
+    <p id="publishStatus" class="status"></p>
+  </section>
+</main>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
+<script>
+const ADMIN_EMAIL="rubekdeveloper@gmail.com";
+const firebaseConfig={
+  apiKey:"AIzaSyDbsMB4jg3l0SXd94S9G_Ezx1xHbcmyB74",
+  authDomain:"sunetuz-aviator-admin.firebaseapp.com",
+  databaseURL:"https://sunetuz-aviator-admin-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId:"sunetuz-aviator-admin",
+  storageBucket:"sunetuz-aviator-admin.firebasestorage.app",
+  messagingSenderId:"841012045957",
+  appId:"1:841012045957:web:39849ffa5ec5436cac21ec"
+};
+firebase.initializeApp(firebaseConfig);
+const auth=firebase.auth();
+const db=firebase.database();
+let serverOffset=0;
+const $=id=>document.getElementById(id);
+const show=(id,message,ok=false)=>{const el=$(id);el.textContent=message;el.className="status "+(ok?"ok":"err")};
+db.ref(".info/serverTimeOffset").on("value",snap=>{serverOffset=Number(snap.val())||0});
+db.ref("aviator/current").on("value",snap=>{
+  const item=snap.val();
+  if(!item){$("currentValue").textContent="—";$("currentTime").textContent="Signal hali yuborilmagan";return}
+  $("currentValue").textContent=Number(item.value).toFixed(2)+"x";
+  $("currentTime").textContent=new Date(Number(item.publishedAt)).toLocaleString("uz-UZ");
+});
+auth.onAuthStateChanged(user=>{
+  const signedIn=Boolean(user&&user.email===ADMIN_EMAIL);
+  $("loginBox").classList.toggle("hidden",signedIn);
+  $("adminBox").classList.toggle("hidden",!signedIn);
+  if(!signedIn&&user) auth.signOut();
+});
+$("loginBtn").onclick=async()=>{
+  const password=$("password").value;
+  if(!password){show("loginStatus","Parolni kiriting");return}
+  $("loginBtn").disabled=true; show("loginStatus","Tekshirilmoqda...");
+  try{
+    await auth.signInWithEmailAndPassword(ADMIN_EMAIL,password);
+    $("password").value=""; show("loginStatus","Kirish muvaffaqiyatli",true);
+  }catch(_){show("loginStatus","Parol noto‘g‘ri yoki ulanishda xato")}
+  $("loginBtn").disabled=false;
+};
+$("password").addEventListener("keydown",e=>{if(e.key==="Enter")$("loginBtn").click()});
+$("publishBtn").onclick=async()=>{
+  const value=Number(String($("coefficient").value).replace(",","."));
+  if(!Number.isFinite(value)||value<1.01||value>100){show("publishStatus","1.01 dan 100 gacha koeffitsient kiriting");return}
+  $("publishBtn").disabled=true; show("publishStatus","Yuborilmoqda...");
+  try{
+    const now=Date.now()+serverOffset;
+    await db.ref("aviator").transaction(data=>{
+      data=data||{};
+      const history=data.history||{};
+      history["s"+now]={value:Number(value.toFixed(2)),time:now};
+      const keys=Object.keys(history).sort((a,b)=>(history[b].time||0)-(history[a].time||0));
+      keys.slice(5).forEach(key=>delete history[key]);
+      return {current:{value:Number(value.toFixed(2)),publishedAt:now},history};
+    });
+    $("coefficient").value="";
+    show("publishStatus","Signal hammaga yuborildi",true);
+  }catch(_){show("publishStatus","Signal yuborilmadi. Internetni tekshiring")}
+  $("publishBtn").disabled=false;
+};
+$("logoutBtn").onclick=()=>auth.signOut();
+</script>
+</body>
+</html>

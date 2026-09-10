@@ -1504,8 +1504,12 @@
   const AVIATOR_COUNTDOWN = 2*60*1000;
   const AVIATOR_SPLASH_MS = 8*1000;
   const AVIATOR_INTERVAL = AVIATOR_PAUSE+AVIATOR_COUNTDOWN;
-  const AVIATOR_STORAGE_KEY = "sunetAviatorSignalV6";
+  const AVIATOR_STORAGE_KEY = "sunetAviatorSignalV7Firebase";
+  const AVIATOR_DB_URL = "https://sunetuz-aviator-admin-default-rtdb.asia-southeast1.firebasedatabase.app/aviator.json";
   let aviatorState = null;
+  let aviatorRemoteActive = false;
+  let aviatorRemoteData = null;
+  let aviatorRemoteRequest = null;
 
   function aviatorSignalForSlot(slot){
     let value = (Number(slot)^0x9e3779b9)>>>0;
@@ -1549,6 +1553,53 @@
     saveAviatorState();
   }
 
+  function applyRemoteAviator(data){
+    const current = data && data.current;
+    const publishedAt = Number(current && current.publishedAt);
+    const value = Number(current && current.value);
+    if(!Number.isFinite(publishedAt) || !Number.isFinite(value) || value < 1) return false;
+    const now = Date.now();
+    const pauseUntil = publishedAt + AVIATOR_PAUSE;
+    const history = Object.values(data.history || {}).map(item=>({
+      value:Number(item && item.value),
+      time:Number(item && (item.time || item.publishedAt))
+    })).filter(item=>Number.isFinite(item.value) && item.value >= 1 && Number.isFinite(item.time))
+      .sort((a,b)=>b.time-a.time)
+      .filter(item=>item.time < publishedAt || now >= pauseUntil)
+      .slice(0,5);
+    aviatorRemoteData = data;
+    aviatorRemoteActive = true;
+    aviatorState = {
+      slot:"firebase-"+publishedAt,
+      current:value,
+      currentAt:publishedAt,
+      pauseUntil,
+      nextAt:publishedAt+AVIATOR_INTERVAL,
+      history
+    };
+    renderAviator();
+    tickAviator();
+    return true;
+  }
+
+  async function refreshRemoteAviator(force){
+    if(aviatorRemoteRequest) return aviatorRemoteRequest;
+    if(!force && document.hidden) return;
+    const controller = typeof AbortController === "function" ? new AbortController() : null;
+    const timer = controller ? setTimeout(()=>controller.abort(),4500) : null;
+    aviatorRemoteRequest = fetch(AVIATOR_DB_URL+(AVIATOR_DB_URL.includes("?")?"&":"?")+"v="+Date.now(),{
+      cache:"no-store",
+      signal:controller ? controller.signal : undefined
+    }).then(response=>response.ok ? response.json() : null)
+      .then(data=>{ if(data) applyRemoteAviator(data); })
+      .catch(()=>{})
+      .finally(()=>{
+        if(timer) clearTimeout(timer);
+        aviatorRemoteRequest = null;
+      });
+    return aviatorRemoteRequest;
+  }
+
   function aviatorLocale(){
     return currentLanguage === "ru" ? "ru-RU" : currentLanguage === "en" ? "en-GB" : "uz-UZ";
   }
@@ -1568,13 +1619,17 @@
   function tickAviator(){
     if(!aviatorState) return;
     const now = Date.now();
-    const slot = Math.floor(now/AVIATOR_INTERVAL);
-    const includeCurrent = now >= slot*AVIATOR_INTERVAL+AVIATOR_PAUSE;
-    const firstHistoryTime = (includeCurrent ? slot : slot-1)*AVIATOR_INTERVAL;
-    if(aviatorState.slot!==slot || Number(aviatorState.history[0]?.time)!==firstHistoryTime){
-      aviatorState = createAviatorState(now);
-      saveAviatorState();
-      renderAviator();
+    if(!aviatorRemoteActive){
+      const slot = Math.floor(now/AVIATOR_INTERVAL);
+      const includeCurrent = now >= slot*AVIATOR_INTERVAL+AVIATOR_PAUSE;
+      const firstHistoryTime = (includeCurrent ? slot : slot-1)*AVIATOR_INTERVAL;
+      if(aviatorState.slot!==slot || Number(aviatorState.history[0]?.time)!==firstHistoryTime){
+        aviatorState = createAviatorState(now);
+        saveAviatorState();
+        renderAviator();
+      }
+    }else if(aviatorRemoteData && now >= aviatorState.pauseUntil && aviatorState.history[0]?.time !== aviatorState.currentAt){
+      applyRemoteAviator(aviatorRemoteData);
     }
     const isPause = now < aviatorState.pauseUntil;
     const showWaiting = !isPause;
@@ -1584,7 +1639,7 @@
     }
     const waitingElapsed = Math.max(0,now-aviatorState.pauseUntil);
     const waitingRemaining = Math.max(0,aviatorState.nextAt-now);
-    const showSplash = showWaiting && (waitingElapsed < AVIATOR_SPLASH_MS || waitingRemaining <= AVIATOR_SPLASH_MS);
+    const showSplash = showWaiting && waitingRemaining > 0 && (waitingElapsed < AVIATOR_SPLASH_MS || waitingRemaining <= AVIATOR_SPLASH_MS);
     const showBlocks = showWaiting && !showSplash;
     aviatorSignal.style.display = showWaiting ? "none" : "flex";
     aviatorAnimation.style.display = showWaiting ? "none" : "block";
@@ -1673,6 +1728,7 @@
     renderAviator();
     tickAviator();
     ensureAviatorAnimation();
+    refreshRemoteAviator(true);
   }
 
   function ensureAviatorButtonAnimation(){
@@ -1700,7 +1756,11 @@
 
   loadAviatorState();
   tickAviator();
+  refreshRemoteAviator(true);
   setInterval(tickAviator,1000);
+  setInterval(()=>{
+    if(!aviatorModal.classList.contains("hidden")) refreshRemoteAviator(false);
+  },5000);
 
   function ensureAndroidModalAnimation(){
     if(!window.lottie) return;
