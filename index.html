@@ -1587,7 +1587,7 @@
     if(!force && document.hidden) return;
     const controller = typeof AbortController === "function" ? new AbortController() : null;
     const timer = controller ? setTimeout(()=>controller.abort(),4500) : null;
-    aviatorRemoteRequest = fetch(AVIATOR_DB_URL+(AVIATOR_DB_URL.includes("?")?"&":"?")+"v="+Date.now(),{
+    aviatorRemoteRequest = fetch(AVIATOR_DB_URL,{
       cache:"no-store",
       signal:controller ? controller.signal : undefined
     }).then(response=>response.ok ? response.json() : null)
