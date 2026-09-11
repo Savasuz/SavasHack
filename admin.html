@@ -9,7 +9,7 @@
 :root{color-scheme:dark;--cyan:#35d8ff;--violet:#655cff;--green:#39e89b;--red:#ff5572}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{min-height:100%;margin:0;font-family:Arial,sans-serif;background:#030712;color:#f5f8ff}
-body{display:grid;place-items:center;padding:24px;background:radial-gradient(circle at 50% 8%,#14254b 0,transparent 42%),#030712}
+body{display:grid;justify-items:center;align-items:start;padding:24px;background:radial-gradient(circle at 50% 8%,#14254b 0,transparent 42%),#030712}
 .card{width:min(100%,420px);padding:24px;border:1px solid rgba(78,160,255,.32);border-radius:28px;background:linear-gradient(145deg,rgba(12,29,54,.96),rgba(4,10,23,.96));box-shadow:0 28px 70px rgba(0,0,0,.52),0 0 40px rgba(42,116,255,.12)}
 h1{margin:0 0 7px;font-size:27px;text-align:center;background:linear-gradient(90deg,#fff,#71dcff);-webkit-background-clip:text;color:transparent}
 .sub{text-align:center;color:#aebed4;margin:0 0 22px}
@@ -22,7 +22,14 @@ button:disabled{opacity:.55;cursor:wait}.hidden{display:none!important}
 .status{min-height:22px;margin:14px 0 0;text-align:center;color:#aebed4}.status.ok{color:var(--green)}.status.err{color:var(--red)}
 .current{margin-top:18px;padding:15px;border:1px solid rgba(92,173,255,.22);border-radius:18px;background:rgba(2,9,20,.66);text-align:center}
 .current strong{display:block;font-size:32px;color:#8be6ff;margin:5px 0}.meta{font-size:13px;color:#91a4bf}
-.row{display:flex;gap:10px}.row button:last-child{width:auto;padding-inline:18px;background:#142139}
+.admin-menu{display:grid;gap:10px;margin:18px 0 16px}
+.admin-tab{display:flex;align-items:center;justify-content:space-between;margin:0;padding:14px 16px;border:1px solid rgba(92,173,255,.24);border-radius:17px;background:#071326;color:#dce8f8;box-shadow:none}
+.admin-tab .tab-label{display:flex;align-items:center;gap:11px}.admin-tab .tab-icon{font-size:22px}.admin-tab .tab-arrow{color:#7890ad;font-size:21px;transition:transform .2s}
+.admin-tab.active{border-color:rgba(53,216,255,.72);background:linear-gradient(90deg,rgba(53,216,255,.18),rgba(101,92,255,.16));box-shadow:0 0 0 3px rgba(53,216,255,.06)}
+.admin-tab.active .tab-arrow{transform:rotate(90deg);color:var(--cyan)}
+.admin-panel{padding-top:1px}.admin-panel .current{margin-top:0}
+.row{display:flex;gap:10px;margin-top:6px}.row button:last-child{width:100%;padding-inline:18px;background:#142139}
+@media(max-width:480px){body{padding:14px}.card{padding:19px;border-radius:24px}h1{font-size:25px}}
 </style>
 </head>
 <body>
@@ -36,23 +43,35 @@ button:disabled{opacity:.55;cursor:wait}.hidden{display:none!important}
     <p id="loginStatus" class="status"></p>
   </section>
   <section id="adminBox" class="hidden">
-    <div class="current">
-      <span>Hozirgi umumiy signal</span>
-      <strong id="currentValue">—</strong>
-      <span id="currentTime" class="meta">Signal hali yuborilmagan</span>
-    </div>
-    <label for="coefficient">Yangi koeffitsient</label>
-    <input id="coefficient" type="number" inputmode="decimal" min="1.01" max="100" step="0.01" placeholder="Masalan: 1.85">
-    <button id="publishBtn" type="button">Hammaga signal yuborish</button>
-    <p id="publishStatus" class="status"></p>
-    <div class="current">
-      <span>Oxirgi yuborilgan xabar</span>
-      <p id="currentMessage" class="meta">Xabar hali yuborilmagan</p>
-    </div>
-    <label for="announcement">Barchaga xabar</label>
-    <textarea id="announcement" maxlength="500" placeholder="Xabar matnini yozing"></textarea>
-    <button id="messagePublishBtn" type="button">Barchaga xabar yuborish</button>
-    <p id="messageStatus" class="status"></p>
+    <nav class="admin-menu" aria-label="Admin bo‘limlari">
+      <button id="aviatorTab" class="admin-tab active" type="button" aria-controls="aviatorPanel" aria-expanded="true">
+        <span class="tab-label"><span class="tab-icon">✈</span><span>Aviator</span></span><span class="tab-arrow">›</span>
+      </button>
+      <button id="messageTab" class="admin-tab" type="button" aria-controls="messagePanel" aria-expanded="false">
+        <span class="tab-label"><span class="tab-icon">✉</span><span>Xabar</span></span><span class="tab-arrow">›</span>
+      </button>
+    </nav>
+    <section id="aviatorPanel" class="admin-panel">
+      <div class="current">
+        <span>Hozirgi umumiy signal</span>
+        <strong id="currentValue">—</strong>
+        <span id="currentTime" class="meta">Signal hali yuborilmagan</span>
+      </div>
+      <label for="coefficient">Yangi koeffitsient</label>
+      <input id="coefficient" type="number" inputmode="decimal" min="1.01" max="100" step="0.01" placeholder="Masalan: 1.85">
+      <button id="publishBtn" type="button">Hammaga signal yuborish</button>
+      <p id="publishStatus" class="status"></p>
+    </section>
+    <section id="messagePanel" class="admin-panel hidden">
+      <div class="current">
+        <span>Oxirgi yuborilgan xabar</span>
+        <p id="currentMessage" class="meta">Xabar hali yuborilmagan</p>
+      </div>
+      <label for="announcement">Barchaga xabar</label>
+      <textarea id="announcement" maxlength="500" placeholder="Xabar matnini yozing"></textarea>
+      <button id="messagePublishBtn" type="button">Barchaga xabar yuborish</button>
+      <p id="messageStatus" class="status"></p>
+    </section>
     <div class="row"><button id="logoutBtn" type="button">Chiqish</button></div>
   </section>
 </main>
@@ -76,6 +95,17 @@ const db=firebase.database();
 let serverOffset=0;
 const $=id=>document.getElementById(id);
 const show=(id,message,ok=false)=>{const el=$(id);el.textContent=message;el.className="status "+(ok?"ok":"err")};
+const openPanel=name=>{
+  const aviator=name==="aviator";
+  $("aviatorPanel").classList.toggle("hidden",!aviator);
+  $("messagePanel").classList.toggle("hidden",aviator);
+  $("aviatorTab").classList.toggle("active",aviator);
+  $("messageTab").classList.toggle("active",!aviator);
+  $("aviatorTab").setAttribute("aria-expanded",String(aviator));
+  $("messageTab").setAttribute("aria-expanded",String(!aviator));
+};
+$("aviatorTab").onclick=()=>openPanel("aviator");
+$("messageTab").onclick=()=>openPanel("message");
 db.ref(".info/serverTimeOffset").on("value",snap=>{serverOffset=Number(snap.val())||0});
 db.ref("aviator/current").on("value",snap=>{
   const item=snap.val();
@@ -91,6 +121,7 @@ auth.onAuthStateChanged(user=>{
   const signedIn=Boolean(user&&user.email===ADMIN_EMAIL);
   $("loginBox").classList.toggle("hidden",signedIn);
   $("adminBox").classList.toggle("hidden",!signedIn);
+  if(signedIn) openPanel("aviator");
   if(!signedIn&&user) auth.signOut();
 });
 $("loginBtn").onclick=async()=>{
