@@ -14,8 +14,9 @@ body{display:grid;place-items:center;padding:24px;background:radial-gradient(cir
 h1{margin:0 0 7px;font-size:27px;text-align:center;background:linear-gradient(90deg,#fff,#71dcff);-webkit-background-clip:text;color:transparent}
 .sub{text-align:center;color:#aebed4;margin:0 0 22px}
 label{display:block;margin:15px 2px 7px;color:#c8d6e9;font-weight:700}
-input{width:100%;border:1px solid rgba(92,173,255,.28);border-radius:17px;padding:15px 14px;background:#050e1d;color:#fff;font-size:18px;text-align:center;outline:0}
-input:focus{border-color:var(--cyan);box-shadow:0 0 0 4px rgba(53,216,255,.09)}
+input,textarea{width:100%;border:1px solid rgba(92,173,255,.28);border-radius:17px;padding:15px 14px;background:#050e1d;color:#fff;font-size:18px;text-align:center;outline:0;font-family:inherit}
+input:focus,textarea:focus{border-color:var(--cyan);box-shadow:0 0 0 4px rgba(53,216,255,.09)}
+textarea{min-height:112px;resize:vertical;text-align:left;line-height:1.45}
 button{width:100%;border:0;border-radius:20px;padding:15px;margin-top:16px;color:white;font-size:17px;font-weight:800;background:linear-gradient(90deg,var(--cyan),var(--violet));cursor:pointer}
 button:disabled{opacity:.55;cursor:wait}.hidden{display:none!important}
 .status{min-height:22px;margin:14px 0 0;text-align:center;color:#aebed4}.status.ok{color:var(--green)}.status.err{color:var(--red)}
@@ -43,8 +44,16 @@ button:disabled{opacity:.55;cursor:wait}.hidden{display:none!important}
     <label for="coefficient">Yangi koeffitsient</label>
     <input id="coefficient" type="number" inputmode="decimal" min="1.01" max="100" step="0.01" placeholder="Masalan: 1.85">
     <button id="publishBtn" type="button">Hammaga signal yuborish</button>
-    <div class="row"><button id="logoutBtn" type="button">Chiqish</button></div>
     <p id="publishStatus" class="status"></p>
+    <div class="current">
+      <span>Oxirgi yuborilgan xabar</span>
+      <p id="currentMessage" class="meta">Xabar hali yuborilmagan</p>
+    </div>
+    <label for="announcement">Barchaga xabar</label>
+    <textarea id="announcement" maxlength="500" placeholder="Xabar matnini yozing"></textarea>
+    <button id="messagePublishBtn" type="button">Barchaga xabar yuborish</button>
+    <p id="messageStatus" class="status"></p>
+    <div class="row"><button id="logoutBtn" type="button">Chiqish</button></div>
   </section>
 </main>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
@@ -73,6 +82,10 @@ db.ref("aviator/current").on("value",snap=>{
   if(!item){$("currentValue").textContent="—";$("currentTime").textContent="Signal hali yuborilmagan";return}
   $("currentValue").textContent=Number(item.value).toFixed(2)+"x";
   $("currentTime").textContent=new Date(Number(item.publishedAt)).toLocaleString("uz-UZ");
+});
+db.ref("aviator/announcement").on("value",snap=>{
+  const item=snap.val();
+  $("currentMessage").textContent=item&&item.text ? item.text : "Xabar hali yuborilmagan";
 });
 auth.onAuthStateChanged(user=>{
   const signedIn=Boolean(user&&user.email===ADMIN_EMAIL);
@@ -103,12 +116,26 @@ $("publishBtn").onclick=async()=>{
       history["s"+now]={value:Number(value.toFixed(2)),time:now};
       const keys=Object.keys(history).sort((a,b)=>(history[b].time||0)-(history[a].time||0));
       keys.slice(5).forEach(key=>delete history[key]);
-      return {current:{value:Number(value.toFixed(2)),publishedAt:now},history};
+      data.current={value:Number(value.toFixed(2)),publishedAt:now};
+      data.history=history;
+      return data;
     });
     $("coefficient").value="";
     show("publishStatus","Signal hammaga yuborildi",true);
   }catch(_){show("publishStatus","Signal yuborilmadi. Internetni tekshiring")}
   $("publishBtn").disabled=false;
+};
+$("messagePublishBtn").onclick=async()=>{
+  const text=$("announcement").value.trim();
+  if(!text){show("messageStatus","Xabar matnini yozing");return}
+  $("messagePublishBtn").disabled=true; show("messageStatus","Yuborilmoqda...");
+  try{
+    const now=Date.now()+serverOffset;
+    await db.ref("aviator/announcement").set({id:String(now),text,createdAt:now});
+    $("announcement").value="";
+    show("messageStatus","Xabar barchaga yuborildi",true);
+  }catch(_){show("messageStatus","Xabar yuborilmadi. Internetni tekshiring")}
+  $("messagePublishBtn").disabled=false;
 };
 $("logoutBtn").onclick=()=>auth.signOut();
 </script>

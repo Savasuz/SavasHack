@@ -181,6 +181,17 @@
   .info-rules-btn{position:absolute;right:0;top:50%;transform:translateY(-50%);width:40px;height:40px;padding:2px;border:0;background:transparent;cursor:pointer;filter:drop-shadow(0 0 8px rgba(51,214,255,.28))}
   .info-rules-animation{width:100%;height:100%;pointer-events:none}
 
+  .message-btn{position:absolute;left:0;top:50%;transform:translateY(-50%);width:40px;height:40px;padding:7px;border:0;border-radius:50%;color:#dff8ff;background:rgba(7,77,112,.82);cursor:pointer;display:grid;place-items:center;box-shadow:0 0 16px rgba(51,214,255,.18)}
+  .message-btn svg{width:24px;height:24px;fill:currentColor}
+  .message-badge{position:absolute;top:1px;right:1px;width:10px;height:10px;border-radius:50%;background:#ff405d;border:2px solid #07111f;box-shadow:0 0 8px rgba(255,64,93,.8)}
+  .notification-overlay{position:fixed;inset:0;z-index:96;display:grid;place-items:center;padding:22px;background:rgba(0,3,10,.78);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+  .notification-modal{position:relative;width:min(100%,360px);padding:24px 20px 20px;border-radius:26px;border:1px solid rgba(72,153,255,.34);background:linear-gradient(155deg,#0b1d35,#040b18);box-shadow:0 28px 80px rgba(0,0,0,.58),0 0 35px rgba(51,214,255,.1);text-align:center}
+  .notification-icon{width:54px;height:54px;margin:0 auto 10px;display:grid;place-items:center;border-radius:18px;background:linear-gradient(145deg,#20c9f4,#625bff);font-size:27px;box-shadow:0 12px 28px rgba(51,136,255,.28)}
+  .notification-title{margin:0 0 10px;font-size:22px}
+  .notification-text{margin:0;color:#e9f2ff;font-size:16px;line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere}
+  .notification-time{display:block;margin-top:13px;color:#91a5c0;font-size:13px}
+  .notification-close{width:100%;margin-top:18px;padding:13px;border:0;border-radius:17px;background:linear-gradient(90deg,var(--blue1),var(--blue2));color:#fff;font-size:16px;font-weight:800;cursor:pointer}
+
   .aviator-bottom-btn{width:112px;height:40px;margin-top:14px;padding:0;border-radius:14px;border:1px solid rgba(255,72,112,.34);background:rgba(24,8,24,.82);cursor:pointer;overflow:hidden;box-shadow:0 0 18px rgba(255,54,99,.1),inset 0 1px 0 rgba(255,255,255,.05)}
   .aviator-bottom-btn .aviator-button-animation{width:100%;height:100%}
   .aviator-bottom-btn .aviator-button-animation svg{transform:scale(.66)!important}
@@ -1077,6 +1088,10 @@
 <div id="menuScreen" class="screen">
   <div class="panel">
     <div class="panel-heading">
+      <button id="messageButton" class="message-btn" type="button" onclick="openAnnouncement()" aria-label="Xabarlar">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 17.5c-1.2-1.3-2-2.7-2-6A6 6 0 0 0 6 11.5c0 3.3-.8 4.7-2 6-.5.6-.1 1.5.7 1.5h14.6c.8 0 1.2-.9.7-1.5ZM9.8 20a2.3 2.3 0 0 0 4.4 0H9.8Z"/></svg>
+        <span id="messageBadge" class="message-badge hidden" aria-hidden="true"></span>
+      </button>
       <div class="title">SUNETUZ</div>
       <button class="info-rules-btn" type="button" onclick="openRules()" aria-label="Qoidalar">
         <div id="infoRulesAnimation" class="info-rules-animation" aria-hidden="true"></div>
@@ -1143,6 +1158,16 @@
       <button class="download-action" type="button" onclick="closeDownload()" data-i18n="cancel">Bekor qilish</button>
       <button class="download-action primary" type="button" onclick="continueDownload()" data-i18n="continue">Davom etish</button>
     </div>
+  </div>
+</div>
+
+<div id="announcementModal" class="notification-overlay hidden" onclick="closeAnnouncement(event)">
+  <div class="notification-modal" role="dialog" aria-modal="true" aria-labelledby="announcementTitle">
+    <div class="notification-icon" aria-hidden="true">✉️</div>
+    <h2 id="announcementTitle" class="notification-title">SUNETUZ xabari</h2>
+    <p id="announcementText" class="notification-text">Hozircha yangi xabar yo‘q.</p>
+    <time id="announcementTime" class="notification-time"></time>
+    <button class="notification-close" type="button" onclick="closeAnnouncement()">Yopish</button>
   </div>
 </div>
 
@@ -1510,6 +1535,8 @@
   let aviatorRemoteActive = false;
   let aviatorRemoteData = null;
   let aviatorRemoteRequest = null;
+  const ANNOUNCEMENT_READ_KEY = "sunetAnnouncementReadV1";
+  let currentAnnouncement = null;
 
   function aviatorSignalForSlot(slot){
     let value = (Number(slot)^0x9e3779b9)>>>0;
@@ -1553,7 +1580,37 @@
     saveAviatorState();
   }
 
+  function applyAnnouncement(item){
+    const text = String(item && item.text || "").trim();
+    const createdAt = Number(item && item.createdAt);
+    if(!text || !Number.isFinite(createdAt)) return;
+    const id = String(item.id || createdAt);
+    currentAnnouncement = {id,text,createdAt};
+    document.getElementById("announcementText").textContent = text;
+    document.getElementById("announcementTime").textContent = new Date(createdAt).toLocaleString(aviatorLocale());
+    const seen = localStorage.getItem(ANNOUNCEMENT_READ_KEY) === id;
+    document.getElementById("messageBadge").classList.toggle("hidden",seen);
+  }
+
+  function openAnnouncement(){
+    if(!currentAnnouncement){
+      document.getElementById("announcementText").textContent = "Hozircha yangi xabar yo‘q.";
+      document.getElementById("announcementTime").textContent = "";
+    }else{
+      localStorage.setItem(ANNOUNCEMENT_READ_KEY,currentAnnouncement.id);
+      document.getElementById("messageBadge").classList.add("hidden");
+    }
+    document.getElementById("announcementModal").classList.remove("hidden");
+  }
+
+  function closeAnnouncement(event){
+    const modal = document.getElementById("announcementModal");
+    if(event && event.target !== modal) return;
+    modal.classList.add("hidden");
+  }
+
   function applyRemoteAviator(data){
+    applyAnnouncement(data && data.announcement);
     const current = data && data.current;
     const publishedAt = Number(current && current.publishedAt);
     const value = Number(current && current.value);
@@ -1775,9 +1832,7 @@
   tickAviator();
   refreshRemoteAviator(true);
   setInterval(tickAviator,1000);
-  setInterval(()=>{
-    if(!aviatorModal.classList.contains("hidden")) refreshRemoteAviator(false);
-  },5000);
+  setInterval(()=>refreshRemoteAviator(false),10000);
 
   function ensureAndroidModalAnimation(){
     if(!window.lottie) return;
