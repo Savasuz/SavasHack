@@ -28,6 +28,8 @@ button:disabled{opacity:.55;cursor:wait}.hidden{display:none!important}
 .admin-tab.active{border-color:rgba(53,216,255,.72);background:linear-gradient(90deg,rgba(53,216,255,.18),rgba(101,92,255,.16));box-shadow:0 0 0 3px rgba(53,216,255,.06)}
 .admin-tab.active .tab-arrow{transform:rotate(90deg);color:var(--cyan)}
 .admin-panel{padding-top:1px}.admin-panel .current{margin-top:0}
+.danger{margin-top:10px;border:1px solid rgba(255,85,114,.45);background:rgba(255,85,114,.1);color:#ff8da2}
+.danger:not(:disabled):hover{background:rgba(255,85,114,.18)}
 .row{display:flex;gap:10px;margin-top:6px}.row button:last-child{width:100%;padding-inline:18px;background:#142139}
 @media(max-width:480px){body{padding:14px}.card{padding:19px;border-radius:24px}h1{font-size:25px}}
 </style>
@@ -70,6 +72,7 @@ button:disabled{opacity:.55;cursor:wait}.hidden{display:none!important}
       <label for="announcement">Barchaga xabar</label>
       <textarea id="announcement" maxlength="500" placeholder="Xabar matnini yozing"></textarea>
       <button id="messagePublishBtn" type="button">Barchaga xabar yuborish</button>
+      <button id="messageDeleteBtn" class="danger" type="button" disabled>Yuborilgan xabarni o‘chirish</button>
       <p id="messageStatus" class="status"></p>
     </section>
     <div class="row"><button id="logoutBtn" type="button">Chiqish</button></div>
@@ -115,7 +118,9 @@ db.ref("aviator/current").on("value",snap=>{
 });
 db.ref("aviator/announcement").on("value",snap=>{
   const item=snap.val();
-  $("currentMessage").textContent=item&&item.text ? item.text : "Xabar hali yuborilmagan";
+  const exists=Boolean(item&&item.text);
+  $("currentMessage").textContent=exists ? item.text : "Xabar hali yuborilmagan";
+  $("messageDeleteBtn").disabled=!exists;
 });
 auth.onAuthStateChanged(user=>{
   const signedIn=Boolean(user&&user.email===ADMIN_EMAIL);
@@ -167,6 +172,18 @@ $("messagePublishBtn").onclick=async()=>{
     show("messageStatus","Xabar barchaga yuborildi",true);
   }catch(_){show("messageStatus","Xabar yuborilmadi. Internetni tekshiring")}
   $("messagePublishBtn").disabled=false;
+};
+$("messageDeleteBtn").onclick=async()=>{
+  if(!confirm("Yuborilgan xabar barcha foydalanuvchilardan o‘chirilsinmi?")) return;
+  $("messageDeleteBtn").disabled=true; show("messageStatus","O‘chirilmoqda...");
+  try{
+    await db.ref("aviator/announcement").remove();
+    $("announcement").value="";
+    show("messageStatus","Xabar barcha foydalanuvchilardan o‘chirildi",true);
+  }catch(_){
+    show("messageStatus","Xabar o‘chirilmadi. Internetni tekshiring");
+    $("messageDeleteBtn").disabled=false;
+  }
 };
 $("logoutBtn").onclick=()=>auth.signOut();
 </script>

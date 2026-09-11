@@ -1164,8 +1164,8 @@
 <div id="announcementModal" class="notification-overlay hidden" onclick="closeAnnouncement(event)">
   <div class="notification-modal" role="dialog" aria-modal="true" aria-labelledby="announcementTitle">
     <div class="notification-icon" aria-hidden="true">✉️</div>
-    <h2 id="announcementTitle" class="notification-title">SUNETUZ xabari</h2>
-    <p id="announcementText" class="notification-text">Hozircha yangi xabar yo‘q.</p>
+    <h2 id="announcementTitle" class="notification-title">Yangiliklar</h2>
+    <p id="announcementText" class="notification-text">Hozircha yangilik yo‘q.</p>
     <time id="announcementTime" class="notification-time"></time>
     <button class="notification-close" type="button" onclick="closeAnnouncement()">Yopish</button>
   </div>
@@ -1583,7 +1583,13 @@
   function applyAnnouncement(item){
     const text = String(item && item.text || "").trim();
     const createdAt = Number(item && item.createdAt);
-    if(!text || !Number.isFinite(createdAt)) return;
+    if(!text || !Number.isFinite(createdAt)){
+      currentAnnouncement = null;
+      document.getElementById("announcementText").textContent = "Hozircha yangilik yo‘q.";
+      document.getElementById("announcementTime").textContent = "";
+      document.getElementById("messageBadge").classList.add("hidden");
+      return;
+    }
     const id = String(item.id || createdAt);
     currentAnnouncement = {id,text,createdAt};
     document.getElementById("announcementText").textContent = text;
@@ -1594,7 +1600,7 @@
 
   function openAnnouncement(){
     if(!currentAnnouncement){
-      document.getElementById("announcementText").textContent = "Hozircha yangi xabar yo‘q.";
+      document.getElementById("announcementText").textContent = "Hozircha yangilik yo‘q.";
       document.getElementById("announcementTime").textContent = "";
     }else{
       localStorage.setItem(ANNOUNCEMENT_READ_KEY,currentAnnouncement.id);
