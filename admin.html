@@ -55,6 +55,9 @@ button:disabled{opacity:.55;cursor:wait}.hidden{display:none!important}
       <button id="apkTab" class="admin-tab" type="button" aria-controls="apkPanel" aria-expanded="false">
         <span class="tab-label"><span class="tab-icon">⬇</span><span>APK linki</span></span><span class="tab-arrow">›</span>
       </button>
+      <button id="telegramTab" class="admin-tab" type="button" aria-controls="telegramPanel" aria-expanded="false">
+        <span class="tab-label"><span class="tab-icon">✈️</span><span>Telegram linki</span></span><span class="tab-arrow">›</span>
+      </button>
     </nav>
     <section id="aviatorPanel" class="admin-panel">
       <div class="current">
@@ -88,6 +91,16 @@ button:disabled{opacity:.55;cursor:wait}.hidden{display:none!important}
       <button id="apkSaveBtn" type="button">APK linkini saqlash</button>
       <p id="apkStatus" class="status"></p>
     </section>
+    <section id="telegramPanel" class="admin-panel hidden">
+      <div class="current">
+        <span>Hozir ishlayotgan Telegram havolasi</span>
+        <p id="currentTelegramLink" class="meta">Havola yuklanmoqda...</p>
+      </div>
+      <label for="telegramLink">Yangi Telegram havolasi</label>
+      <input id="telegramLink" type="url" inputmode="url" autocomplete="url" placeholder="https://t.me/kanal">
+      <button id="telegramSaveBtn" type="button">Telegram linkini saqlash</button>
+      <p id="telegramStatus" class="status"></p>
+    </section>
     <div class="row"><button id="logoutBtn" type="button">Chiqish</button></div>
   </section>
 </main>
@@ -112,7 +125,7 @@ let serverOffset=0;
 const $=id=>document.getElementById(id);
 const show=(id,message,ok=false)=>{const el=$(id);el.textContent=message;el.className="status "+(ok?"ok":"err")};
 const openPanel=name=>{
-  ["aviator","message","apk"].forEach(panel=>{
+  ["aviator","message","apk","telegram"].forEach(panel=>{
     const active=name===panel;
     $(panel+"Panel").classList.toggle("hidden",!active);
     $(panel+"Tab").classList.toggle("active",active);
@@ -122,6 +135,7 @@ const openPanel=name=>{
 $("aviatorTab").onclick=()=>openPanel("aviator");
 $("messageTab").onclick=()=>openPanel("message");
 $("apkTab").onclick=()=>openPanel("apk");
+$("telegramTab").onclick=()=>openPanel("telegram");
 db.ref(".info/serverTimeOffset").on("value",snap=>{serverOffset=Number(snap.val())||0});
 db.ref("aviator/current").on("value",snap=>{
   const item=snap.val();
@@ -139,6 +153,11 @@ db.ref("aviator/apkLink").on("value",snap=>{
   const url=String(snap.val()||"").trim();
   $("currentApkLink").textContent=url||"Standart havola ishlatilmoqda";
   if(url&&!$("apkLink").value) $("apkLink").value=url;
+});
+db.ref("aviator/telegramLink").on("value",snap=>{
+  const url=String(snap.val()||"").trim();
+  $("currentTelegramLink").textContent=url||"Standart Telegram havolasi ishlatilmoqda";
+  if(url&&!$("telegramLink").value) $("telegramLink").value=url;
 });
 auth.onAuthStateChanged(user=>{
   const signedIn=Boolean(user&&user.email===ADMIN_EMAIL);
@@ -224,6 +243,28 @@ $("apkSaveBtn").onclick=async()=>{
   $("apkSaveBtn").disabled=false;
 };
 $("apkLink").addEventListener("keydown",e=>{if(e.key==="Enter")$("apkSaveBtn").click()});
+$("telegramSaveBtn").onclick=async()=>{
+  const value=$("telegramLink").value.trim();
+  let url;
+  try{
+    url=new URL(value);
+    const host=url.hostname.toLowerCase().replace(/^www\./,"");
+    if(url.protocol!=="https:"||!["t.me","telegram.me"].includes(host)) throw new Error("telegram");
+  }catch(_){
+    show("telegramStatus","To‘liq https://t.me/... Telegram havolasini kiriting");
+    return;
+  }
+  $("telegramSaveBtn").disabled=true; show("telegramStatus","Saqlanmoqda...");
+  try{
+    await db.ref("aviator/telegramLink").set(url.href);
+    $("telegramLink").value=url.href;
+    show("telegramStatus","Telegram havolasi hammada yangilandi",true);
+  }catch(_){
+    show("telegramStatus","Havola saqlanmadi. Internetni tekshiring");
+  }
+  $("telegramSaveBtn").disabled=false;
+};
+$("telegramLink").addEventListener("keydown",e=>{if(e.key==="Enter")$("telegramSaveBtn").click()});
 $("logoutBtn").onclick=()=>auth.signOut();
 </script>
 </body>

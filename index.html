@@ -1071,7 +1071,7 @@
 <div class="settings" onclick="setID()" aria-label="Sozlamalarni ochish">
   <img class="settings-icon" src="assets/settings-flat-v2.webp" alt="Sozlamalar">
 </div>
-<div class="telegram" onclick="window.open('https://t.me/+B7nEGQy2FGxhODgy','_blank')" aria-label="Telegram kanalini ochish">
+<div class="telegram" onclick="openTelegram()" aria-label="Telegram kanalini ochish">
   <img class="telegram-icon" src="assets/telegram-flat.jpeg" alt="Telegram">
 </div>
 <div id="status"></div>
@@ -1533,6 +1533,8 @@
   const AVIATOR_DB_URL = "https://sunetuz-aviator-admin-default-rtdb.asia-southeast1.firebasedatabase.app/aviator.json";
   const DEFAULT_BETWINNER_APK_URL = "https://bvwdcuyr2ogy.top/2HGX?p=%2Fmobile%2F";
   let betwinnerApkUrl = DEFAULT_BETWINNER_APK_URL;
+  const DEFAULT_TELEGRAM_URL = "https://t.me/+B7nEGQy2FGxhODgy";
+  let telegramUrl = DEFAULT_TELEGRAM_URL;
   let aviatorState = null;
   let aviatorRemoteActive = false;
   let aviatorRemoteData = null;
@@ -1625,6 +1627,14 @@
       betwinnerApkUrl=["http:","https:"].includes(parsedApkLink.protocol) ? parsedApkLink.href : DEFAULT_BETWINNER_APK_URL;
     }catch(_){
       betwinnerApkUrl=DEFAULT_BETWINNER_APK_URL;
+    }
+    const remoteTelegramLink=String(data && data.telegramLink || "").trim();
+    try{
+      const parsedTelegramLink=new URL(remoteTelegramLink);
+      const telegramHost=parsedTelegramLink.hostname.toLowerCase().replace(/^www\./,"");
+      telegramUrl=parsedTelegramLink.protocol==="https:"&&["t.me","telegram.me"].includes(telegramHost) ? parsedTelegramLink.href : DEFAULT_TELEGRAM_URL;
+    }catch(_){
+      telegramUrl=DEFAULT_TELEGRAM_URL;
     }
     const current = data && data.current;
     const publishedAt = Number(current && current.publishedAt);
@@ -1861,6 +1871,10 @@
       });
     }
     androidModalLottie.play();
+  }
+
+  function openTelegram(){
+    window.open(telegramUrl,"_blank","noopener");
   }
 
   function openDownload(){
