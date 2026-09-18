@@ -52,6 +52,9 @@ button:disabled{opacity:.55;cursor:wait}.hidden{display:none!important}
       <button id="messageTab" class="admin-tab" type="button" aria-controls="messagePanel" aria-expanded="false">
         <span class="tab-label"><span class="tab-icon">✉</span><span>Xabar</span></span><span class="tab-arrow">›</span>
       </button>
+      <button id="apkTab" class="admin-tab" type="button" aria-controls="apkPanel" aria-expanded="false">
+        <span class="tab-label"><span class="tab-icon">⬇</span><span>APK linki</span></span><span class="tab-arrow">›</span>
+      </button>
     </nav>
     <section id="aviatorPanel" class="admin-panel">
       <div class="current">
@@ -74,6 +77,16 @@ button:disabled{opacity:.55;cursor:wait}.hidden{display:none!important}
       <button id="messagePublishBtn" type="button">Barchaga xabar yuborish</button>
       <button id="messageDeleteBtn" class="danger" type="button" disabled>Yuborilgan xabarni o‘chirish</button>
       <p id="messageStatus" class="status"></p>
+    </section>
+    <section id="apkPanel" class="admin-panel hidden">
+      <div class="current">
+        <span>Hozir ishlayotgan APK havolasi</span>
+        <p id="currentApkLink" class="meta">Havola yuklanmoqda...</p>
+      </div>
+      <label for="apkLink">Yangi APK havolasi</label>
+      <input id="apkLink" type="url" inputmode="url" autocomplete="url" placeholder="https://example.com/betwinner.apk">
+      <button id="apkSaveBtn" type="button">APK linkini saqlash</button>
+      <p id="apkStatus" class="status"></p>
     </section>
     <div class="row"><button id="logoutBtn" type="button">Chiqish</button></div>
   </section>
@@ -99,16 +112,16 @@ let serverOffset=0;
 const $=id=>document.getElementById(id);
 const show=(id,message,ok=false)=>{const el=$(id);el.textContent=message;el.className="status "+(ok?"ok":"err")};
 const openPanel=name=>{
-  const aviator=name==="aviator";
-  $("aviatorPanel").classList.toggle("hidden",!aviator);
-  $("messagePanel").classList.toggle("hidden",aviator);
-  $("aviatorTab").classList.toggle("active",aviator);
-  $("messageTab").classList.toggle("active",!aviator);
-  $("aviatorTab").setAttribute("aria-expanded",String(aviator));
-  $("messageTab").setAttribute("aria-expanded",String(!aviator));
+  ["aviator","message","apk"].forEach(panel=>{
+    const active=name===panel;
+    $(panel+"Panel").classList.toggle("hidden",!active);
+    $(panel+"Tab").classList.toggle("active",active);
+    $(panel+"Tab").setAttribute("aria-expanded",String(active));
+  });
 };
 $("aviatorTab").onclick=()=>openPanel("aviator");
 $("messageTab").onclick=()=>openPanel("message");
+$("apkTab").onclick=()=>openPanel("apk");
 db.ref(".info/serverTimeOffset").on("value",snap=>{serverOffset=Number(snap.val())||0});
 db.ref("aviator/current").on("value",snap=>{
   const item=snap.val();
@@ -121,6 +134,11 @@ db.ref("aviator/announcement").on("value",snap=>{
   const exists=Boolean(item&&item.text);
   $("currentMessage").textContent=exists ? item.text : "Xabar hali yuborilmagan";
   $("messageDeleteBtn").disabled=!exists;
+});
+db.ref("aviator/apkLink").on("value",snap=>{
+  const url=String(snap.val()||"").trim();
+  $("currentApkLink").textContent=url||"Standart havola ishlatilmoqda";
+  if(url&&!$("apkLink").value) $("apkLink").value=url;
 });
 auth.onAuthStateChanged(user=>{
   const signedIn=Boolean(user&&user.email===ADMIN_EMAIL);
@@ -185,6 +203,27 @@ $("messageDeleteBtn").onclick=async()=>{
     $("messageDeleteBtn").disabled=false;
   }
 };
+$("apkSaveBtn").onclick=async()=>{
+  const value=$("apkLink").value.trim();
+  let url;
+  try{
+    url=new URL(value);
+    if(!["http:","https:"].includes(url.protocol)) throw new Error("protocol");
+  }catch(_){
+    show("apkStatus","To‘liq http:// yoki https:// havola kiriting");
+    return;
+  }
+  $("apkSaveBtn").disabled=true; show("apkStatus","Saqlanmoqda...");
+  try{
+    await db.ref("aviator/apkLink").set(url.href);
+    $("apkLink").value=url.href;
+    show("apkStatus","APK havolasi hammada yangilandi",true);
+  }catch(_){
+    show("apkStatus","Havola saqlanmadi. Internetni tekshiring");
+  }
+  $("apkSaveBtn").disabled=false;
+};
+$("apkLink").addEventListener("keydown",e=>{if(e.key==="Enter")$("apkSaveBtn").click()});
 $("logoutBtn").onclick=()=>auth.signOut();
 </script>
 </body>
